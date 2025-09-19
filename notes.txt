@@ -1,0 +1,3 @@
+update stripe keys (live version)
+youtube video updaten
+app maken

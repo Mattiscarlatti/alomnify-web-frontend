@@ -36,28 +36,9 @@ export default function PaymentSuccess() {
         </h1>
         
         <p className="text-gray-600 mb-6">
-          Uw betaling is succesvol verwerkt! Uw PlantenCollectie NFT wordt nu gemaakt op de Cardano blockchain. 
-          U ontvangt binnen enkele minuten een email met alle details en de transactie hash.
+          Uw betaling is succesvol verwerkt! Uw PlantenCollectie wordt nu opgeslagen. 
+          U ontvangt binnen enkele minuten een email met o.a. link naar uw collectie.
         </p>
-
-        <div className="bg-green-50 p-4 rounded-lg mb-6">
-          <h3 className="font-semibold mb-2 text-green-800">Wat gebeurt er nu?</h3>
-          <ul className="text-sm text-green-700 text-left space-y-1">
-            <li>• ✅ Uw betaling is succesvol verwerkt</li>
-            <li>• 🚀 Uw PlantenCollectie NFT wordt nu gemint op de blockchain</li>
-            <li>• 📧 U ontvangt een email met de transactie hash als bewijs</li>
-            <li>• 💎 Uw NFT bevat alle gekozen planten en omgevingsfactoren</li>
-          </ul>
-        </div>
-
-        <div className="bg-blue-50 p-4 rounded-lg mb-6">
-          <h3 className="font-semibold mb-2 text-blue-800">Belangrijk:</h3>
-          <ul className="text-sm text-blue-700 text-left space-y-1">
-            <li>• Bewaar de email met transactie hash veilig</li>
-            <li>• Dit is uw bewijs van eigendom van de PlantenCollectie</li>
-            <li>• De transactie is permanent opgeslagen op de blockchain</li>
-          </ul>
-        </div>
 
         <button
           onClick={() => window.location.href = "/"}

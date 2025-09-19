@@ -129,7 +129,7 @@ const PlantCollectionPage = () => {
 
   const fetchMetadata = async (collectionId: string) => {
     try {
-        const response = await fetch("https://alomnify-api.alomnify.workers.dev/api/collections", {
+        const response = await fetch("https://alomnify-api-staging.alomnify.workers.dev/api/collections", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -316,7 +316,7 @@ const PlantCollectionPage = () => {
 
   const loadFlora = async (planT: number) => {
     try {
-      const response = await fetch(`https://alomnify-api.alomnify.workers.dev/api/plants/${planT}`, {
+      const response = await fetch(`https://alomnify-api-staging.alomnify.workers.dev/api/plants/${planT}`, {
         method: 'GET',
       });
 

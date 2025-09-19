@@ -52,7 +52,7 @@ const StripePayment = () => {
 
     try {
       // Create payment intent via backend server
-      const response = await fetch("https://alomnify-api.alomnify.workers.dev/api/payments/create-payment-intent", {
+      const response = await fetch("https://alomnify-api-staging.alomnify.workers.dev/api/payments/create-payment-intent", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

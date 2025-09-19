@@ -68,7 +68,7 @@ const StripePayment = () => {
         throw new Error(`API error: ${response.statusText}`);
       }
 
-      const { clientSecret, paymentIntentId } = await response.json();
+      const { client_secret, payment_intent_id } = await response.json();
 
       // Redirect to Stripe payment page
       const stripe = await stripePromise;
@@ -78,14 +78,14 @@ const StripePayment = () => {
 
       setPaymentStatus("Doorverwijzen naar betaling...");
       
-      const { error } = await stripe.confirmIdealPayment(clientSecret, {
+      const { error } = await stripe.confirmIdealPayment(client_secret, {
         payment_method: {
           ideal: {},
           billing_details: {
             email: email,
           },
         },
-        return_url: `${window.location.origin}/payment-success?payment_intent=${paymentIntentId}`,
+        return_url: `${window.location.origin}/payment-success?payment_intent=${payment_intent_id}`,
       });
 
       if (error) {

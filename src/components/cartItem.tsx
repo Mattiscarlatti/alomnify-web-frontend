@@ -33,20 +33,20 @@ const CartItem = () => {
       </thead>
       <tbody>
         {floraData?.map((plantje: Flora) => (
-          <tr key={plantje.lt_name}>
-            <td className="border border-gray-300 px-2 py-2">{plantje._id}</td>
-            <td className="border border-gray-300 px-2 py-2">{plantje.lt_name}</td>
-            <td className="border border-gray-300 px-2 py-2">{plantje?.nl_name}</td>
-            <td className="border border-gray-300 px-2 py-2">{plantje?.pt_type}</td>
-            <td className="border border-gray-300 px-2 py-2">{plantje?.endang_ered}</td>
-            <td className="border border-gray-300 px-2 py-2">{plantje?.en_demic}</td>
-            <td className="border border-gray-300 px-2 py-2">{plantje?.ed_ible}</td>
-            <td className="border border-gray-300 px-2 py-2">{plantje?.flow_ercolor}</td>
-            <td className="border border-gray-300 px-2 py-2">{plantje?.flow_ering}</td>
-            <td className="border border-gray-300 px-2 py-2">{plantje?.ev_ergreen}</td>
+          <tr key={plantje.latin_name}>
+            <td className="border border-gray-300 px-2 py-2">{plantje.id}</td>
+            <td className="border border-gray-300 px-2 py-2">{plantje.latin_name}</td>
+            <td className="border border-gray-300 px-2 py-2">{plantje?.dutch_name}</td>
+            <td className="border border-gray-300 px-2 py-2">{plantje?.plant_type}</td>
+            <td className="border border-gray-300 px-2 py-2">{plantje?.be_dreigd}</td>
+            <td className="border border-gray-300 px-2 py-2">{plantje?.in_heems}</td>
+            <td className="border border-gray-300 px-2 py-2">{plantje?.eet_baar}</td>
+            <td className="border border-gray-300 px-2 py-2">{plantje?.bloem_kleur}</td>
+            <td className="border border-gray-300 px-2 py-2">{plantje?.bloei_tijd}</td>
+            <td className="border border-gray-300 px-2 py-2">{plantje?.groen_blijvend}</td>
             <td className="border border-gray-300 px-2 py-2">
               <div onClick={() =>
-              dispatch(deletePlant(plantje._id))
+              dispatch(deletePlant(plantje.id))
 
             }
             className="flex items-center cursor-pointer group"

@@ -15,7 +15,7 @@ export const shoppingSlice = createSlice({
   reducers: {
     addToCart: (state, action) => {
       const existingPlant = state.floraData.find(
-        (item: Flora) => item._id === action.payload._id
+        (item: Flora) => item.id === action.payload.id
       );
       if (existingPlant) {
       } else {
@@ -24,7 +24,7 @@ export const shoppingSlice = createSlice({
     },
     deletePlant: (state, action) => {
       state.floraData = state.floraData.filter(
-        (item) => item._id !== action.payload
+        (item) => item.id !== action.payload
       );
     },
     resetCart: (state) => {

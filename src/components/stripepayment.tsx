@@ -16,7 +16,7 @@ const stripePromise = stripePublishableKey ? loadStripe(stripePublishableKey) : 
 
 const StripePayment = () => {
   const { floraData } = useSelector((state: StateProps) => state?.shopping);
-  const listIDs: number[] = floraData?.map((plantje: Flora) => plantje._id);
+  const listIDs: number[] = floraData?.map((plantje: Flora) => plantje.id);
   const dialogRef = useRef<HTMLDialogElement>(null);
   const [loading, setLoading] = useState(false);
   const [paymentStatus, setPaymentStatus] = useState<string>("");
@@ -52,7 +52,7 @@ const StripePayment = () => {
 
     try {
       // Create payment intent via backend server
-      const response = await fetch("https://alomnify-app-server.vercel.app/api/payments/create-payment-intent", {
+      const response = await fetch("https://alomnify-api.alomnify.workers.dev/api/payments/create-payment-intent", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

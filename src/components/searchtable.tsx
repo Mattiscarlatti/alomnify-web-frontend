@@ -30,7 +30,7 @@ const SearchTable = () => {
         limit: '100'
       });
       
-      const response = await fetch(`https://alomnify-app-server.vercel.app/api/plants?${params}`);
+      const response = await fetch(`https://alomnify-api.alomnify.workers.dev/api/plants?${params}`);
 
       if (!response.ok) {
         throw new Error(`Error: ${response.status}`);
@@ -38,20 +38,8 @@ const SearchTable = () => {
 
       const data = await response.json();
       
-      // Transform backend response to frontend format
-      const transformedResults = data.plants.map((plant: any) => ({
-        _id: plant.id,
-        lt_name: plant.latin_name,
-        nl_name: plant.dutch_name,
-        eng_name: plant.english_name,
-        pt_type: plant.plant_type,
-        ed_ible: plant.eet_baar,
-        flow_ering: plant.bloei_tijd,
-        flow_ercolor: plant.bloem_kleur,
-        ev_ergreen: plant.groen_blijvend,
-        en_demic: plant.in_heems,
-        endang_ered: plant.be_dreigd,
-      }));
+      // Use backend response directly with correct property names
+      const transformedResults = data.plants;
       
       setResults(transformedResults);
     } catch (err: any) {
@@ -115,17 +103,17 @@ const SearchTable = () => {
       </thead>
       <tbody>
         {results.map((florum, index) => (
-          <tr key={`${florum._id}-${index}`}>
-            <td className="border border-gray-300 px-2 py-2">{florum._id}</td>
-            <td className="border border-gray-300 px-2 py-2">{florum.lt_name}</td>
-            <td className="border border-gray-300 px-2 py-2">{florum?.nl_name}</td>
-            <td className="border border-gray-300 px-2 py-2">{florum?.pt_type}</td>
-            <td className="border border-gray-300 px-2 py-2">{florum?.endang_ered}</td>
-            <td className="border border-gray-300 px-2 py-2">{florum?.en_demic}</td>
-            <td className="border border-gray-300 px-2 py-2">{florum?.ed_ible}</td>
-            <td className="border border-gray-300 px-2 py-2">{florum?.flow_ercolor}</td>
-            <td className="border border-gray-300 px-2 py-2">{florum?.flow_ering}</td>
-            <td className="border border-gray-300 px-2 py-2">{florum?.ev_ergreen}</td>
+          <tr key={`${florum.id}-${index}`}>
+            <td className="border border-gray-300 px-2 py-2">{florum.id}</td>
+            <td className="border border-gray-300 px-2 py-2">{florum.latin_name}</td>
+            <td className="border border-gray-300 px-2 py-2">{florum?.dutch_name}</td>
+            <td className="border border-gray-300 px-2 py-2">{florum?.plant_type}</td>
+            <td className="border border-gray-300 px-2 py-2">{florum?.be_dreigd}</td>
+            <td className="border border-gray-300 px-2 py-2">{florum?.in_heems}</td>
+            <td className="border border-gray-300 px-2 py-2">{florum?.eet_baar}</td>
+            <td className="border border-gray-300 px-2 py-2">{florum?.bloem_kleur}</td>
+            <td className="border border-gray-300 px-2 py-2">{florum?.bloei_tijd}</td>
+            <td className="border border-gray-300 px-2 py-2">{florum?.groen_blijvend}</td>
             <td className="border border-gray-300 px-2 py-2">
             <button onClick={() => {
               dispatch(addToCart(florum))

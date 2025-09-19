@@ -45,18 +45,18 @@ const calculateRecordScore = (flora: Flora2): number => {
   } else if (flora.plant_type.includes("meerjarig")) {
     score *= 1.5;
   }
-  if (flora.ende_mic.includes("inheems")) {
+  if (flora.in_heems && flora.in_heems.includes("inheems")) {
     score *= 2.5;
   }
-  if (flora.en_dangered.includes("niet")) {
+  if (flora.be_dreigd && flora.be_dreigd.includes("niet")) {
     score *= 1;
-  } else if (flora.en_dangered.includes("gevoelig")) {
+  } else if (flora.be_dreigd && flora.be_dreigd.includes("gevoelig")) {
     score *= 1.5;
-  } else if (flora.en_dangered.includes("kwetsbaar")) {
+  } else if (flora.be_dreigd && flora.be_dreigd.includes("kwetsbaar")) {
     score *= 2;
-  } else if (flora.en_dangered.includes("ernstig")) {
+  } else if (flora.be_dreigd && flora.be_dreigd.includes("ernstig")) {
     score *= 3;
-  } else if (flora.en_dangered.length > 1) {
+  } else if (flora.be_dreigd && flora.be_dreigd.length > 1) {
     score *= 2.5; 
   }
   return score;
@@ -127,29 +127,33 @@ const PlantCollectionPage = () => {
     }
   }, [txH]);
 
-  const fetchMetadata = async (txH: string) => {
+  const fetchMetadata = async (collectionId: string) => {
     try {
-        const response = await fetch("https://alomnify-app-server.vercel.app/api/collection/get-metadata", {
+        // For now, we'll need to get the email from somewhere
+        // In a real implementation, you'd need user authentication
+        const email = prompt("Voer uw email adres in om de collectie te laden:");
+        if (!email) return;
+
+        const response = await fetch("https://alomnify-api.alomnify.workers.dev/api/collections", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ txh: txH }),
+          body: JSON.stringify({ collectionId: parseInt(collectionId), email: email }),
         });
-        const resMetadata = await response.json();
-        const jsonMetadata = resMetadata[0]?.json_metadata;
-        const policyId = Object.keys(jsonMetadata).find(key => key !== "version");
-        const assetId = Object.keys(jsonMetadata[policyId!])[0];
-        const plantenString = jsonMetadata[policyId!][assetId]?.planten || [];
-        const plantenJson = JSON.stringify(plantenString);
-        const plantenArray: number[] = JSON.parse(plantenJson);
-        setPlanten(plantenArray);
-        const factorString = jsonMetadata[policyId!][assetId]?.factoren || [];
-        const factorJson = JSON.stringify(factorString);
-        const factorArray: Record<string, number> = JSON.parse(factorJson);
-        setFactors(factorArray);
+        
+        if (!response.ok) {
+          throw new Error(`Error: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        const collection = data.collection;
+        
+        setPlanten(collection.plantIds);
+        setFactors(collection.environmentalFactors);
       } catch (error) {
         console.log(error);
+        setError("Fout bij het laden van collectie. Controleer het ID en email adres.");
     }
   };
   
@@ -179,10 +183,10 @@ const PlantCollectionPage = () => {
         const aantalBom25 = jsonObject.filter(obj => obj.latin_name.includes(" ca. 25"));
         const aantalB25 = aantalBom25.length;
         setAantalBomen25(aantalB25);
-        const aantalGroenBl = jsonObject.filter(obj => obj.ever_green === " groenblijvend");
+        const aantalGroenBl = jsonObject.filter(obj => obj.groen_blijvend === " groenblijvend");
         const aantalGroenB = aantalGroenBl.length;
         setAantalGroen(aantalGroenB);
-        const aantalEetb = jsonObject.filter(obj => obj.edi_bility?.trim());
+        const aantalEetb = jsonObject.filter(obj => obj.eet_baar?.trim());
         const aantalEetba = aantalEetb.length;
         setAantalEetbaar(aantalEetba);
         const plantTypeCounts = jsonObject.reduce<Record<string, number>>((acc, flor) => {
@@ -197,7 +201,7 @@ const PlantCollectionPage = () => {
         const sortedPTCounts = [...formattedPlantTypeCounts].sort((a, b) => b.value - a.value);
         setAantalType(sortedPTCounts);
         const plantEndemicCounts = jsonObject.reduce<Record<string, number>>((acc, flor) => {
-          acc[flor.ende_mic] = (acc[flor.ende_mic] || 0) + 1;
+          acc[flor.in_heems] = (acc[flor.in_heems] || 0) + 1;
           return acc;        
         }, {});
         const formattedEndemicCounts = Object.entries(plantEndemicCounts).map(([key, value]) => ({
@@ -206,7 +210,7 @@ const PlantCollectionPage = () => {
         }));
         setAantalInheems(formattedEndemicCounts);
         const plantEndangeredCounts = jsonObject.reduce<Record<string, number>>((acc, flor) => {
-          acc[flor.en_dangered] = (acc[flor.en_dangered] || 0) + 1;
+          acc[flor.be_dreigd] = (acc[flor.be_dreigd] || 0) + 1;
           return acc;        
         }, {});
         delete plantEndangeredCounts[" "];
@@ -216,46 +220,46 @@ const PlantCollectionPage = () => {
           value: value
         }));
         setAantalBedreigd(formattedEndangeredCounts);
-        const aantalBedr = jsonObject.filter(obj => obj.en_dangered === " bedreigd");
+        const aantalBedr = jsonObject.filter(obj => obj.be_dreigd === " bedreigd");
         const aantalBedrei = aantalBedr.length;
         setAantalBedreigd2(aantalBedrei);
-        const aantalEBedr = jsonObject.filter(obj => obj.en_dangered === " ernstig bedreigd");
+        const aantalEBedr = jsonObject.filter(obj => obj.be_dreigd === " ernstig bedreigd");
         const aantalEBedrei = aantalEBedr.length;
         setAantalErnstigB(aantalEBedrei);
-        const aantalKwets = jsonObject.filter(obj => obj.en_dangered === " kwetsbaar");
+        const aantalKwets = jsonObject.filter(obj => obj.be_dreigd === " kwetsbaar");
         const aantalKwetsb = aantalKwets.length;
         setAantalKwetsbaar(aantalKwetsb);
-        const aantalGev = jsonObject.filter(obj => obj.en_dangered === " gevoelig");
+        const aantalGev = jsonObject.filter(obj => obj.be_dreigd === " gevoelig");
         const aantalGevoe = aantalGev.length;
         setAantalGevoelig(aantalGevoe);
-        const aantalInhee = jsonObject.filter(obj => obj.ende_mic === " inheems");
+        const aantalInhee = jsonObject.filter(obj => obj.in_heems === " inheems");
         const aantalInhe = aantalInhee.length;
         setAantalInh(aantalInhe);
-        const aantallen1 = jsonObject.filter(obj => obj.flower_ing.includes(" 1 "));
+        const aantallen1 = jsonObject.filter(obj => obj.bloei_tijd.includes(" 1 "));
         const aantalle1 = aantallen1.length;
-        const aantallen2 = jsonObject.filter(obj => obj.flower_ing.includes(" 2"));
+        const aantallen2 = jsonObject.filter(obj => obj.bloei_tijd.includes(" 2"));
         const aantalle2 = aantallen2.length;
-        const aantallen3 = jsonObject.filter(obj => obj.flower_ing.includes(" 3"));
+        const aantallen3 = jsonObject.filter(obj => obj.bloei_tijd.includes(" 3"));
         const aantalle3 = aantallen3.length;
-        const aantallen4 = jsonObject.filter(obj => obj.flower_ing.includes(" 4"));
+        const aantallen4 = jsonObject.filter(obj => obj.bloei_tijd.includes(" 4"));
         const aantalle4 = aantallen4.length;
-        const aantallen5 = jsonObject.filter(obj => obj.flower_ing.includes(" 5"));
+        const aantallen5 = jsonObject.filter(obj => obj.bloei_tijd.includes(" 5"));
         const aantalle5 = aantallen5.length;
-        const aantallen6 = jsonObject.filter(obj => obj.flower_ing.includes(" 6"));
+        const aantallen6 = jsonObject.filter(obj => obj.bloei_tijd.includes(" 6"));
         const aantalle6 = aantallen6.length;
-        const aantallen7 = jsonObject.filter(obj => obj.flower_ing.includes(" 7"));
+        const aantallen7 = jsonObject.filter(obj => obj.bloei_tijd.includes(" 7"));
         const aantalle7 = aantallen7.length;
-        const aantallen8 = jsonObject.filter(obj => obj.flower_ing.includes(" 8"));
+        const aantallen8 = jsonObject.filter(obj => obj.bloei_tijd.includes(" 8"));
         const aantalle8 = aantallen8.length;
-        const aantallen9 = jsonObject.filter(obj => obj.flower_ing.includes(" 9"));
+        const aantallen9 = jsonObject.filter(obj => obj.bloei_tijd.includes(" 9"));
         const aantalle9 = aantallen9.length;
-        const aantallen10 = jsonObject.filter(obj => obj.flower_ing.includes(" 10"));
+        const aantallen10 = jsonObject.filter(obj => obj.bloei_tijd.includes(" 10"));
         const aantalle10 = aantallen10.length;
-        const aantallen11 = jsonObject.filter(obj => obj.flower_ing.includes(" 11"));
+        const aantallen11 = jsonObject.filter(obj => obj.bloei_tijd.includes(" 11"));
         const aantalle11 = aantallen11.length;
-        const aantallen12 = jsonObject.filter(obj => obj.flower_ing.includes(" 12"));
+        const aantallen12 = jsonObject.filter(obj => obj.bloei_tijd.includes(" 12"));
         const aantalle12 = aantallen12.length;
-        const aantallen13 = jsonObject.filter(obj => obj.flower_ing.includes(" 1"));
+        const aantallen13 = jsonObject.filter(obj => obj.bloei_tijd.includes(" 1"));
         const aantalle13 = aantallen13.length;
         const aantalle1_2 = aantalle13 - aantalle11 - aantalle12;
         const aantallenBloei = [
@@ -273,27 +277,27 @@ const PlantCollectionPage = () => {
           { name: "december", value: aantalle12 }
         ];
         setAantalBloei(aantallenBloei);
-        const aantallenBlad = jsonObject.filter(obj => obj.edi_bility.includes("bladeren"));
+        const aantallenBlad = jsonObject.filter(obj => obj.eet_baar.includes("bladeren"));
         const aantalleBlad = aantallenBlad.length;
-        const aantallenBloem = jsonObject.filter(obj => obj.edi_bility.includes("bloemen"));
+        const aantallenBloem = jsonObject.filter(obj => obj.eet_baar.includes("bloemen"));
         const aantalleBloem = aantallenBloem.length;
-        const aantallenZaad = jsonObject.filter(obj => obj.edi_bility.includes("zaden"));
+        const aantallenZaad = jsonObject.filter(obj => obj.eet_baar.includes("zaden"));
         const aantalleZaad = aantallenZaad.length;
-        const aantallenJongSch = jsonObject.filter(obj => obj.edi_bility.includes("jonge scheuten"));
+        const aantallenJongSch = jsonObject.filter(obj => obj.eet_baar.includes("jonge scheuten"));
         const aantalleJongSch = aantallenJongSch.length;
-        const aantallenStamBin = jsonObject.filter(obj => obj.edi_bility.includes("stam"));
+        const aantallenStamBin = jsonObject.filter(obj => obj.eet_baar.includes("stam"));
         const aantalleStamBin = aantallenStamBin.length;
-        const aantallenSap = jsonObject.filter(obj => obj.edi_bility.includes("sap"));
+        const aantallenSap = jsonObject.filter(obj => obj.eet_baar.includes("sap"));
         const aantalleSap = aantallenSap.length;
-        const aantallenVrucht = jsonObject.filter(obj => obj.edi_bility.includes("vruchten"));
+        const aantallenVrucht = jsonObject.filter(obj => obj.eet_baar.includes("vruchten"));
         const aantalleVrucht = aantallenVrucht.length;
-        const aantallenOlie = jsonObject.filter(obj => obj.edi_bility.includes("olie"));
+        const aantallenOlie = jsonObject.filter(obj => obj.eet_baar.includes("olie"));
         const aantalleOlie = aantallenOlie.length;
-        const aantallenWortel = jsonObject.filter(obj => obj.edi_bility.includes("wortels"));
+        const aantallenWortel = jsonObject.filter(obj => obj.eet_baar.includes("wortels"));
         const aantalleWortel = aantallenWortel.length;
-        const aantallenSteng = jsonObject.filter(obj => obj.edi_bility.includes("stengel"));
+        const aantallenSteng = jsonObject.filter(obj => obj.eet_baar.includes("stengel"));
         const aantalleSteng = aantallenSteng.length;
-        const aantallenBoon = jsonObject.filter(obj => obj.edi_bility.includes("boon"));
+        const aantallenBoon = jsonObject.filter(obj => obj.eet_baar.includes("boon"));
         const aantalleBoon = aantallenBoon.length;
         const aantallenEet = [
           { name: "vruchten", value: aantalleVrucht },
@@ -316,20 +320,16 @@ const PlantCollectionPage = () => {
 
   const loadFlora = async (planT: number) => {
     try {
-      const response = await fetch('https://alomnify-app-server.vercel.app/api/collection/load-flora', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ query: planT }),
+      const response = await fetch(`https://alomnify-api.alomnify.workers.dev/api/plants/${planT}`, {
+        method: 'GET',
       });
 
       if (!response.ok) {
         throw new Error(`Error: ${response.status}`);
       }
 
-      const datax: Flora2[] = await response.json();
-      return datax;
+      const data = await response.json();
+      return [data.plant]; // Return array format to match existing code structure
     } catch (err: any) {
       setError(err.message);
     }
@@ -360,17 +360,17 @@ const PlantCollectionPage = () => {
 */}
 
   const convertToFlora = (data: any): Flora => ({
-    _id: data.id,
-    lt_name: data.latin_name,
-    nl_name: data.dutch_name,
-    eng_name: data.english_name,
-    pt_type: data.plant_type,
-    ed_ible: data.edi_bility,
-    flow_ering: data.flower_ing,
-    flow_ercolor: data.flower_color,
-    ev_ergreen: data.ever_green,
-    en_demic: data.ende_mic,
-    endang_ered: data.en_dangered,
+    id: data.id,
+    latin_name: data.latin_name,
+    dutch_name: data.dutch_name,
+    english_name: data.english_name,
+    plant_type: data.plant_type,
+    eet_baar: data.eet_baar,
+    bloei_tijd: data.bloei_tijd,
+    bloem_kleur: data.bloem_kleur,
+    groen_blijvend: data.groen_blijvend,
+    in_heems: data.in_heems,
+    be_dreigd: data.be_dreigd,
   });
 
   const handleAPI2 = (lijst: Flora2[]) => {
@@ -382,16 +382,16 @@ const PlantCollectionPage = () => {
     <div className="grid grid-cols-1 gap-6 bg-white/30 p-12 shadow-xl ring-1 ring-gray-900/5 rounded-lg backdrop-blur-lg mx-auto w-full">
       { txH && 
         <div className="grid grid-cols-4 px-3 py-2">
-          <p className="flex flex-col col-span-4 rounded-l-xl items-center justify-center gap-x-1 px-3 py-1">De resultaten worden getoond van de PlantenCollectie met adres: {txH}</p>
+          <p className="flex flex-col col-span-4 rounded-l-xl items-center justify-center gap-x-1 px-3 py-1">De resultaten worden getoond van PlantenCollectie ID: {txH}</p>
         </div>
       }
       <div className="grid grid-cols-3 px-3 py-2 items-center">
-        <button onClick={handleClick2} className="col-span-1 bg-black rounded-l-xl hover:bg-slate-950 text-xs sm:text-base text-slate-100 hover:text-white flex items-center justify-center px-1 sm:px-3 py-1 border-[2px] border-gray-400 hover:border-orange-600 duration-200 relative">Laad PlantenCollectie uit Ingevuld Adres</button>
+        <button onClick={handleClick2} className="col-span-1 bg-black rounded-l-xl hover:bg-slate-950 text-xs sm:text-base text-slate-100 hover:text-white flex items-center justify-center px-1 sm:px-3 py-1 border-[2px] border-gray-400 hover:border-orange-600 duration-200 relative">Laad PlantenCollectie uit Collectie ID</button>
         <input 
           type="text" 
           value={inputValue} 
           onChange={(e) => setInputValue(e.target.value)} 
-          placeholder="Plaats hier adres dat verwijst naar de plantencollectie..."
+          placeholder="Voer collectie ID in (bijv. 1, 2, 3)..."
           className="flex flex-col col-span-1 text-center items-center justify-center text-xs sm:text-base px-1 sm:px-3 py-1 border-[2px] border-gray-400 hover:border-orange-600 duration-200 relative" 
           name="inputtxh"
         />
@@ -447,12 +447,12 @@ const PlantCollectionPage = () => {
                   <td className="border border-gray-300 px-2 py-2">{flor.latin_name}</td>
                   <td className="border border-gray-300 px-2 py-2">{flor?.dutch_name}</td>
                   <td className="border border-gray-300 px-2 py-2">{flor?.plant_type}</td>
-                  <td className="border border-gray-300 px-2 py-2">{flor?.en_dangered}</td>
-                  <td className="border border-gray-300 px-2 py-2">{flor?.ende_mic}</td>
-                  <td className="border border-gray-300 px-2 py-2">{flor?.edi_bility}</td>
-                  <td className="border border-gray-300 px-2 py-2">{flor?.flower_color}</td>
-                  <td className="border border-gray-300 px-2 py-2">{flor?.flower_ing}</td>
-                  <td className="border border-gray-300 px-2 py-2">{flor?.ever_green}</td>
+                  <td className="border border-gray-300 px-2 py-2">{flor?.be_dreigd}</td>
+                  <td className="border border-gray-300 px-2 py-2">{flor?.in_heems}</td>
+                  <td className="border border-gray-300 px-2 py-2">{flor?.eet_baar}</td>
+                  <td className="border border-gray-300 px-2 py-2">{flor?.bloem_kleur}</td>
+                  <td className="border border-gray-300 px-2 py-2">{flor?.bloei_tijd}</td>
+                  <td className="border border-gray-300 px-2 py-2">{flor?.groen_blijvend}</td>
                 </tr>
               ))}
             </tbody>

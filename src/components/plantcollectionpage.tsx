@@ -129,17 +129,12 @@ const PlantCollectionPage = () => {
 
   const fetchMetadata = async (collectionId: string) => {
     try {
-        // For now, we'll need to get the email from somewhere
-        // In a real implementation, you'd need user authentication
-        const email = prompt("Voer uw email adres in om de collectie te laden:");
-        if (!email) return;
-
         const response = await fetch("https://alomnify-api.alomnify.workers.dev/api/collections", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ collectionId: parseInt(collectionId), email: email }),
+          body: JSON.stringify({ collectionId: parseInt(collectionId) }),
         });
         
         if (!response.ok) {
@@ -151,9 +146,10 @@ const PlantCollectionPage = () => {
         
         setPlanten(collection.plantIds);
         setFactors(collection.environmentalFactors);
+        setError(""); // Clear any previous errors
       } catch (error) {
         console.log(error);
-        setError("Fout bij het laden van collectie. Controleer het ID en email adres.");
+        setError("Fout bij het laden van collectie. Controleer het collectie ID.");
     }
   };
   

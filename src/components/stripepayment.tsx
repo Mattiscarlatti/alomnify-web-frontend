@@ -52,15 +52,16 @@ const StripePayment = () => {
 
     try {
       // Create payment intent via backend server
-      const response = await fetch("https://alomnify-api-staging.alomnify.workers.dev/api/payments/create-payment-intent", {
+      const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "https://alomnify-api-production.alomnify.workers.dev";
+      const response = await fetch(`${backendUrl}/api/payments/create-payment-intent`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
           items: listIDs.map(id => ({ id })),
-          customerEmail: email,
           environmentalOptions: formData,
+          contact_info: email,
         }),
       });
 

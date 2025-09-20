@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 export default function PaymentSuccess() {
   const searchParams = useSearchParams();
   const paymentIntentId = searchParams?.get("payment_intent");
+  const email = searchParams?.get("email");
 
   if (!paymentIntentId) {
     return (
@@ -36,9 +37,34 @@ export default function PaymentSuccess() {
         </h1>
         
         <p className="text-gray-600 mb-6">
-          Uw betaling is succesvol verwerkt! Uw PlantenCollectie wordt nu opgeslagen. 
-          U ontvangt binnen enkele minuten een email met o.a. link naar uw collectie.
+          Uw betaling is succesvol verwerkt! Uw PlantenCollectie wordt nu opgeslagen.
         </p>
+
+        {email && (
+          <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+            <h3 className="font-semibold text-green-800 mb-2">✅ Email verzonden!</h3>
+            <p className="text-sm text-green-700 mb-3">
+              U ontvangt binnen enkele minuten een email op <strong>{email}</strong> met uw collectie-ID 
+              en instructies voor het bekijken van uw plantencollectie.
+            </p>
+            <p className="text-sm text-green-700">
+              Controleer ook uw spam/junk folder als u de email niet direct ziet.
+            </p>
+          </div>
+        )}
+
+        {!email && (
+          <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+            <h3 className="font-semibold text-yellow-800 mb-2">Geen email opgegeven</h3>
+            <p className="text-sm text-yellow-700 mb-3">
+              Uw collectie is succesvol aangemaakt. Ga naar de <strong>PlantenCollectie</strong> pagina 
+              en gebruik uw betalings-ID om uw collectie op te vragen bij de beheerder.
+            </p>
+            <p className="text-sm text-yellow-700">
+              Betalings-ID: <code className="bg-yellow-200 px-1 rounded">{paymentIntentId}</code>
+            </p>
+          </div>
+        )}
 
         <button
           onClick={() => window.location.href = "/"}
@@ -56,6 +82,7 @@ export default function PaymentSuccess() {
 
         <div className="mt-6 pt-4 border-t text-sm text-gray-500">
           <p>Betalings-ID: {paymentIntentId}</p>
+          {email && <p>Email: {email}</p>}
         </div>
       </div>
     </div>

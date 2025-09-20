@@ -85,7 +85,7 @@ const StripePayment = () => {
             email: email,
           },
         },
-        return_url: `${window.location.origin}/payment-success?payment_intent=${payment_intent_id}`,
+        return_url: `${window.location.origin}/payment-success?payment_intent=${payment_intent_id}&email=${encodeURIComponent(email)}`,
       });
 
       if (error) {

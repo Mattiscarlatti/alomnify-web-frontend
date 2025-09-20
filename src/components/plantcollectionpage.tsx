@@ -129,12 +129,11 @@ const PlantCollectionPage = () => {
 
   const fetchMetadata = async (collectionId: string) => {
     try {
-        const response = await fetch("https://alomnify-api-staging.alomnify.workers.dev/api/collections", {
-          method: "POST",
+        const response = await fetch(`https://alomnify-api-staging.alomnify.workers.dev/api/collections?id=${collectionId}`, {
+          method: "GET",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ collectionId: parseInt(collectionId) }),
         });
         
         if (!response.ok) {
@@ -387,7 +386,7 @@ const PlantCollectionPage = () => {
           type="text" 
           value={inputValue} 
           onChange={(e) => setInputValue(e.target.value)} 
-          placeholder="Voer collectie ID in (bijv. 1, 2, 3)..."
+          placeholder="Voer uw 64-karakter collectie ID in..."
           className="flex flex-col col-span-1 text-center items-center justify-center text-xs sm:text-base px-1 sm:px-3 py-1 border-[2px] border-gray-400 hover:border-orange-600 duration-200 relative" 
           name="inputtxh"
         />

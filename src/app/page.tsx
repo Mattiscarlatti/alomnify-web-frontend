@@ -1,9 +1,15 @@
 import Intro from "../components/intro";
 
-export default async function Home() {
+interface HomeProps {
+  searchParams: {
+    collection?: string;
+  };
+}
+
+export default async function Home({ searchParams }: HomeProps) {
   return (
     <main className="flex flex-col items-center justify-between">
-      <Intro />
+      <Intro collectionId={searchParams.collection} />
     </main>
   );
 }

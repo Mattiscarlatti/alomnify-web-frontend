@@ -66,10 +66,14 @@ const sumList = (numbers: number[]): number => {
   return numbers.reduce((sum, num) => sum + num, 0);
 };
 
-const PlantCollectionPage = () => {
+interface PlantCollectionPageProps {
+  initialCollectionId?: string | null;
+}
+
+const PlantCollectionPage = ({ initialCollectionId }: PlantCollectionPageProps) => {
   const dispatch = useDispatch();
   const [txH, setTxh] = useState("");
-  const [inputValue, setInputValue] = useState<string>('');
+  const [inputValue, setInputValue] = useState<string>(initialCollectionId || '');
   const [planTen, setPlanten] = useState<number[]>([]);
   const [floras, setFloras] = useState<Flora2[]>([]);
   const [factors, setFactors] = useState<Record<string, number>>({ watr: 0, kalkst: 0, rommel: 0 });
@@ -127,9 +131,16 @@ const PlantCollectionPage = () => {
     }
   }, [txH]);
 
+  // Auto-load collection if initialCollectionId is provided
+  useEffect(() => {
+    if (initialCollectionId) {
+      fetchMetadata(initialCollectionId);
+    }
+  }, [initialCollectionId]);
+
   const fetchMetadata = async (collectionId: string) => {
     try {
-        const response = await fetch(`https://alomnify-api-staging.alomnify.workers.dev/api/collections?id=${collectionId}`, {
+        const response = await fetch(`https://alomnify-api-production.alomnify.workers.dev/api/collections?id=${collectionId}`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",

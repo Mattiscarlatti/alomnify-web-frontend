@@ -3,9 +3,22 @@
 import Container from "@/components/container";
 import Youtube1 from "@/components/youtube1";
 import Banner1 from "@/components/banner1";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 
+interface IntroProps {
+  collectionId?: string;
+}
 
-const Intro = () => {
+const Intro = ({ collectionId }: IntroProps) => {
+  const router = useRouter();
+
+  useEffect(() => {
+    if (collectionId) {
+      // Redirect to plant collection page with the collection ID
+      router.push(`/plantcollection?id=${collectionId}`);
+    }
+  }, [collectionId, router]);
   
   return (
     <>

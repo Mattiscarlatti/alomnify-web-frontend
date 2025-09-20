@@ -326,7 +326,7 @@ const PlantCollectionPage = ({ initialCollectionId }: PlantCollectionPageProps) 
 
   const loadFlora = async (planT: number) => {
     try {
-      const response = await fetch(`https://alomnify-api-staging.alomnify.workers.dev/api/plants/${planT}`, {
+      const response = await fetch(`https://alomnify-api-production.alomnify.workers.dev/api/plants/${planT}`, {
         method: 'GET',
       });
 

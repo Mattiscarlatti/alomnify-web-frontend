@@ -30,7 +30,7 @@ const SearchTable = () => {
         limit: '100'
       });
       
-      const response = await fetch(`https://alomnify-api-staging.alomnify.workers.dev/api/plants?${params}`);
+      const response = await fetch(`https://alomnify-api-production.alomnify.workers.dev/api/plants?${params}`);
 
       if (!response.ok) {
         throw new Error(`Error: ${response.status}`);

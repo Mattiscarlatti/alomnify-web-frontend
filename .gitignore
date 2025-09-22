@@ -40,3 +40,6 @@ next-env.d.ts
 .direnv/
 
 notes.txt
+
+# Claude Code configuration
+CLAUDE.md

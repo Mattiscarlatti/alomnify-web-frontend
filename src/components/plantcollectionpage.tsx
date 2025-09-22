@@ -1,11 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-//import { useCardano } from "@cardano-foundation/cardano-connect-with-wallet";
-//import { NetworkType } from "@cardano-foundation/cardano-connect-with-wallet-core";
-import { Emulator, Lucid } from "@lucid-evolution/lucid";
 import { addToCart } from "@/redux/shoppingSlice";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { ChartBedreigd } from "@/components/chartbedreigd";
 import { ChartEetb } from "@/components/charteetbaar";
 import { ChartBloei } from "@/components/chartbloei";
@@ -84,7 +81,6 @@ const PlantCollectionPage = ({ initialCollectionId }: PlantCollectionPageProps) 
   const [aantalGroen, setAantalGroen] = useState<number>();
   const [aantalEetbaar, setAantalEetbaar] = useState<number>();
   const [aantalType, setAantalType] = useState<{ name: string; value: number }[]>([]);
-  const [aantalInheems, setAantalInheems] = useState< { name: string; value: number}[]>([]);
   const [aantalBedreigd, setAantalBedreigd] = useState< { name: string; value: number}[]>([])
   const [aantalBedreigd2, setAantalBedreigd2] = useState<number>();
   const [aantalErnstigB, setAantalErnstigB] = useState<number>();
@@ -93,32 +89,6 @@ const PlantCollectionPage = ({ initialCollectionId }: PlantCollectionPageProps) 
   const [aantalInh, setAantalInh] = useState<number>();
   const [aantalBloei, setAantalBloei] = useState< { name: string; value: number}[]>([]);
   const [aantalEet, setAantalEet] = useState< { name: string; value: number}[]>([]);
-  const [error, setError] = useState('');
-{/*  const network = NetworkType.MAINNET;
-  const { isConnected, usedAddresses, enabledWallet } = useCardano({
-    limitNetwork: network,
-  });
-  const handleClick = async () => {
-    if (isConnected && enabledWallet) {
-      try {
-        const lucid = await Lucid(new Emulator([]), "Mainnet");
-        const api = await window.cardano[enabledWallet].enable();
-        lucid.selectWallet.fromAPI(api);
-        const response = await fetch("/api/gettxhash", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ address: usedAddresses[0] }),
-        });
-        const resTxh = await response.json();
-        setTxh(resTxh);
-      } catch (error) {
-        console.log(error);
-      }
-    }
-  };
-*/}
 
   const handleClick2 = () => {
     setTxh(inputValue);
@@ -156,10 +126,8 @@ const PlantCollectionPage = ({ initialCollectionId }: PlantCollectionPageProps) 
         
         setPlanten(collection.plantIds);
         setFactors(collection.environmentalFactors);
-        setError(""); // Clear any previous errors
       } catch (error) {
-        console.log(error);
-        setError("Fout bij het laden van collectie. Controleer het collectie ID.");
+        console.error('Error fetching collection:', error);
     }
   };
   
@@ -175,7 +143,6 @@ const PlantCollectionPage = ({ initialCollectionId }: PlantCollectionPageProps) 
         const factorsum = calculateFactorScore(factors);
         const totalsum = Math.round(recordsum**factorsum);
         setTotalScore(totalsum);
-        console.log(recordsum);
         const aantalplanten = jsonObject.length;
         setAantal(aantalplanten);
         const aantalboom = jsonObject.filter(obj => obj.plant_type === " boom");
@@ -206,15 +173,6 @@ const PlantCollectionPage = ({ initialCollectionId }: PlantCollectionPageProps) 
         }));
         const sortedPTCounts = [...formattedPlantTypeCounts].sort((a, b) => b.value - a.value);
         setAantalType(sortedPTCounts);
-        const plantEndemicCounts = jsonObject.reduce<Record<string, number>>((acc, flor) => {
-          acc[flor.in_heems] = (acc[flor.in_heems] || 0) + 1;
-          return acc;        
-        }, {});
-        const formattedEndemicCounts = Object.entries(plantEndemicCounts).map(([key, value]) => ({
-          name: key,
-          value: value
-        }));
-        setAantalInheems(formattedEndemicCounts);
         const plantEndangeredCounts = jsonObject.reduce<Record<string, number>>((acc, flor) => {
           acc[flor.be_dreigd] = (acc[flor.be_dreigd] || 0) + 1;
           return acc;        
@@ -265,9 +223,6 @@ const PlantCollectionPage = ({ initialCollectionId }: PlantCollectionPageProps) 
         const aantalle11 = aantallen11.length;
         const aantallen12 = jsonObject.filter(obj => obj.bloei_tijd.includes(" 12"));
         const aantalle12 = aantallen12.length;
-        const aantallen13 = jsonObject.filter(obj => obj.bloei_tijd.includes(" 1"));
-        const aantalle13 = aantallen13.length;
-        const aantalle1_2 = aantalle13 - aantalle11 - aantalle12;
         const aantallenBloei = [
           { name: "januari", value: aantalle1 },
           { name: "februari", value: aantalle2 },
@@ -337,33 +292,10 @@ const PlantCollectionPage = ({ initialCollectionId }: PlantCollectionPageProps) 
       const data = await response.json();
       return [data.plant]; // Return array format to match existing code structure
     } catch (err: any) {
-      setError(err.message);
+      console.error('Error loading flora:', err.message);
     }
   };
 
-{/*  const handleAPI = async () => {
-    if (isConnected && enabledWallet) {
-      try {
-        const lucid = await Lucid(new Emulator([]), "Mainnet");
-        const api = await window.cardano[enabledWallet].enable();
-        lucid.selectWallet.fromAPI(api);
-        const response = await fetch("/api/requestburn", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ address: usedAddresses[0] }),
-        });
-        const { tx } = await response.json();
-        const signedTx = await lucid.fromTx(tx).sign.withWallet().complete();
-        const txh = await signedTx.submit();
-        console.log(txh);
-      } catch (error) {
-        console.log(error);
-      }
-    }
-  };
-*/}
 
   const convertToFlora = (data: any): Flora => ({
     id: data.id,

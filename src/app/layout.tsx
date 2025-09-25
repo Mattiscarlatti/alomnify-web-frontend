@@ -3,6 +3,7 @@ import "./css/globals.css";
 import Layout from "@/components/layout";
 import Header from "@/components/header";
 import Menu from "@/components/menu";
+import Footer from "@/components/footer";
 
 export const metadata: Metadata = {
   title: {
@@ -24,6 +25,7 @@ export default function RootLayout({
           <Header />
           <Menu />
           {children}
+          <Footer />
         </Layout>
       </body>
     </html>

@@ -8,13 +8,6 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
           {/* Company info */}
           <div className="col-span-1 md:col-span-2">
-            <div className="flex items-center mb-4">
-              <span className="text-2xl">🌱</span>
-              <h3 className="text-xl font-bold ml-2">Alomnify</h3>
-            </div>
-            <p className="text-gray-300 text-sm mb-4">
-              Nederlandse flora collecties voor natuurliefhebbers. Ontdek, verzamel en bewaar uw eigen unieke plantenverzameling.
-            </p>
             <div className="text-sm text-gray-400">
               <p><strong>Alomnify CV</strong></p>
               <p>Gluvinksweg 6</p>

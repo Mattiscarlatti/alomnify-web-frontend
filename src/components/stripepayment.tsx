@@ -91,7 +91,27 @@ const StripePayment = () => {
 
       if (error) {
         console.error("Payment failed:", error);
-        setPaymentStatus(`Betaling mislukt: ${error.message}`);
+        
+        // Handle different error types
+        if (error.type === 'card_error' && error.code === 'payment_intent_authentication_failure') {
+          setPaymentStatus("Betaling geannuleerd door gebruiker.");
+          // Redirect to cancellation page after a short delay
+          setTimeout(() => {
+            window.location.href = `/payment-canceled?payment_intent=${payment_intent_id}&reason=user_canceled`;
+          }, 2000);
+        } else if (error.type === 'card_error') {
+          // Handle specific card errors
+          const errorType = error.decline_code || error.code || 'card_error';
+          setPaymentStatus(`Betaling mislukt: ${error.message}`);
+          setTimeout(() => {
+            window.location.href = `/payment-failed?payment_intent=${payment_intent_id}&error_type=${errorType}&error_message=${encodeURIComponent(error.message || 'Unknown error')}`;
+          }, 2000);
+        } else {
+          setPaymentStatus(`Betaling mislukt: ${error.message}`);
+          setTimeout(() => {
+            window.location.href = `/payment-failed?payment_intent=${payment_intent_id}&error_type=unknown&error_message=${encodeURIComponent(error.message || 'Unknown error')}`;
+          }, 2000);
+        }
       }
     } catch (error) {
       console.error("Error during payment:", error);

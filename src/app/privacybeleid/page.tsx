@@ -24,7 +24,7 @@ export default function PrivacybeleidPage() {
               
               <h3 className="text-lg font-semibold text-gray-900 mb-2">2.1 Persoonlijke gegevens</h3>
               <div className="text-gray-700 leading-relaxed mb-4">
-                • Email adres (voor orderbevestigingen)<br/>
+                • Email adres (verplicht voor orderbevestigingen)<br/>
                 • Betalingsgegevens (verwerkt door Stripe)
               </div>
 
@@ -39,7 +39,8 @@ export default function PrivacybeleidPage() {
               <h3 className="text-lg font-semibold text-gray-900 mb-2">2.3 Collectiegegevens</h3>
               <div className="text-gray-700 leading-relaxed">
                 • Plantencollectie samenstelling (anoniem opgeslagen in beveiligde database)<br/>
-                • Unieke collectie ID (geen koppeling aan persoonlijke gegevens)
+                • Unieke collectie ID (geen koppeling aan persoonlijke gegevens)<br/>
+                • Omgevingsfactoren (stromend water, kalkrijkdom, rommelige hoekjes)
               </div>
             </section>
 
@@ -102,14 +103,25 @@ export default function PrivacybeleidPage() {
             </section>
 
             <section>
-              <h2 className="text-xl font-bold text-gray-900 mb-4">7. Cookies en tracking</h2>
+              <h2 className="text-xl font-bold text-gray-900 mb-4">7. Cookies en lokale opslag</h2>
               <div className="text-gray-700 leading-relaxed">
                 Onze website gebruikt:<br/><br/>
-                • Lokale opslag (localStorage) voor website instellingen en winkelmandje<br/>
-                • Functionele cookies voor website functionaliteit<br/>
-                • Geen tracking cookies van derden<br/>
-                • Geen advertentie tracking<br/>
-                • Stripe cookies (alleen tijdens betaling)
+                
+                <strong>7.1 Lokale opslag (localStorage)</strong><br/>
+                • Winkelmandje inhoud (Redux Persist)<br/>
+                • Website instellingen en voorkeuren<br/>
+                • Tijdelijke plantencollectie data<br/><br/>
+                
+                <strong>7.2 Essentiële cookies</strong><br/>
+                • Next.js session cookies (website functionaliteit)<br/>
+                • Stripe betalingscookies (alleen tijdens checkout)<br/>
+                • Geen permanente tracking cookies<br/><br/>
+                
+                <strong>7.3 Wat we NIET gebruiken</strong><br/>
+                • Google Analytics of andere tracking<br/>
+                • Advertentie cookies<br/>
+                • Social media tracking pixels<br/>
+                • Cross-site tracking cookies
               </div>
             </section>
 
@@ -119,7 +131,7 @@ export default function PrivacybeleidPage() {
                 • Ordergegevens: 10 jaar (fiscale verplichting)<br/>
                 • Email adressen: Tot u vraagt om verwijdering<br/>
                 • Website data: Tot u uw browser cache leegt<br/>
-                • Collectierecords: Permanent (anoniem, geen persoonlijke gegevens)
+                • Collectierecords: Kunnen permanent worden bewaard, maar kunnen op verzoek worden verwijderd
               </div>
             </section>
 
@@ -142,6 +154,7 @@ export default function PrivacybeleidPage() {
                 Gluvinksweg 6<br/>
                 7751 SM Dalen<br/>
                 KvK: 98348124<br/>
+                BTW: NL868458077B01<br/>
                 Email: info@alomnify.nl<br/>
                 Reactietijd: Binnen 30 dagen<br/>
               </div>

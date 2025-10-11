@@ -68,9 +68,9 @@ export default function AlgemeneVoorwaardenPage() {
               <h3 className="text-lg font-semibold text-gray-900 mb-2">4.2 Orderbevestiging</h3>
               <div className="text-gray-700 leading-relaxed mb-4">
                 Na succesvolle betaling ontvangt u:<br/>
-                • Email bevestiging van uw aankoop<br/>
-                • Unieke link naar uw plantencollectie in onze database<br/>
-                • Toegang tot uw anoniem opgeslagen collectiegegevens
+                • Email bevestiging van uw aankoop (email adres is verplicht)<br/>
+                • Unieke collectie ID voor toegang tot uw plantencollectie<br/>
+                • Toegang tot uw anoniem opgeslagen collectiegegevens en omgevingsfactoren
               </div>
 
               <h3 className="text-lg font-semibold text-gray-900 mb-2">4.3 Mislukte betalingen</h3>
@@ -99,7 +99,7 @@ export default function AlgemeneVoorwaardenPage() {
 
               <h3 className="text-lg font-semibold text-gray-900 mb-2">5.3 Data permanentie</h3>
               <div className="text-gray-700 leading-relaxed">
-                De data is niet permanente data. Data kan op verzoek verwijderd worden.
+                Collectierecords kunnen permanent worden bewaard voor continuïteit van de service, maar kunnen op verzoek worden verwijderd conform GDPR rechten.
               </div>
             </section>
 
@@ -159,7 +159,14 @@ export default function AlgemeneVoorwaardenPage() {
               <h2 className="text-xl font-bold text-gray-900 mb-4">9. Privacy en Gegevensverwerking</h2>
               <div className="text-gray-700 leading-relaxed">
                 Wij verwerken uw persoonlijke gegevens conform ons privacybeleid en de AVG/GDPR wetgeving. 
-                Door deze voorwaarden te accepteren, gaat u ook akkoord met ons privacybeleid.
+                Door deze voorwaarden te accepteren, gaat u ook akkoord met ons privacybeleid.<br/><br/>
+                
+                <strong>9.1 Cookies en lokale opslag</strong><br/>
+                Door gebruik van de website accepteert u het gebruik van:<br/>
+                • Lokale opslag (localStorage) voor winkelmandje functionaliteit<br/>
+                • Essentiële cookies voor website operatie<br/>
+                • Stripe cookies tijdens betalingsproces<br/>
+                Voor details zie ons privacybeleid sectie 7.
               </div>
             </section>
 
@@ -211,6 +218,7 @@ export default function AlgemeneVoorwaardenPage() {
                 Gluvinksweg 6<br/>
                 7751 SM Dalen<br/>
                 KvK: 98348124<br/>
+                BTW: NL868458077B01<br/>
                 Email: info@alomnify.nl<br/>
                 Website: www.alomnify.nl
               </div>

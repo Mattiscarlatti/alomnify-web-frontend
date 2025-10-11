@@ -13,6 +13,7 @@ export default function Footer() {
               <p>Gluvinksweg 6</p>
               <p>7751 SM Dalen</p>
               <p>KvK: 98348124</p>
+              <p>BTW: NL868458077B01</p>
               <p>Email: info@alomnify.nl</p>
             </div>
           </div>
@@ -48,6 +49,7 @@ export default function Footer() {
             
             <div className="flex flex-wrap justify-center md:justify-end gap-6 text-xs text-gray-500">
               <span>KvK: 98348124</span>
+              <span>BTW: NL868458077B01</span>
               <span>7751 SM Dalen</span>
               <span>Nederland</span>
             </div>

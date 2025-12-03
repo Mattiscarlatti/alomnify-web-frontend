@@ -1,25 +1,17 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { Flora, StateProps } from "../../type";
-import { loadStripe } from "@stripe/stripe-js";
+import { resetCart } from "@/redux/shoppingSlice";
 
-const stripePublishableKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
-
-if (!stripePublishableKey) {
-  console.error("NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY is not defined");
-}
-
-const stripePromise = stripePublishableKey ? loadStripe(stripePublishableKey) : null;
-
-
-const StripePayment = () => {
+const CollectionSubmission = () => {
+  const dispatch = useDispatch();
   const { floraData } = useSelector((state: StateProps) => state?.shopping);
   const listIDs: number[] = floraData?.map((plantje: Flora) => plantje.id);
   const dialogRef = useRef<HTMLDialogElement>(null);
   const [loading, setLoading] = useState(false);
-  const [paymentStatus, setPaymentStatus] = useState<string>("");
+  const [submitStatus, setSubmitStatus] = useState<string>("");
   const [email, setEmail] = useState("");
   const [formData, setFormData] = useState<{ [key: string]: boolean }>({
     watr: false,
@@ -34,26 +26,21 @@ const StripePayment = () => {
     }));
   };
 
-  const handlePayment = async (event: React.FormEvent) => {
+  const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    
-    if (!stripePublishableKey) {
-      setPaymentStatus("Stripe is niet geconfigureerd. Neem contact op met de beheerder.");
-      return;
-    }
-    
+
     if (!email) {
       alert("Vul alstublieft uw email adres in.");
       return;
     }
 
     setLoading(true);
-    setPaymentStatus("Betaling initiëren...");
+    setSubmitStatus("Collectie aanmaken...");
 
     try {
-      // Create payment intent via backend server
+      // Create free collection via backend server
       const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "https://alomnify-api-production.alomnify.workers.dev";
-      const response = await fetch(`${backendUrl}/api/payments/create-payment-intent`, {
+      const response = await fetch(`${backendUrl}/api/collections/create-free`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -69,53 +56,21 @@ const StripePayment = () => {
         throw new Error(`API error: ${response.statusText}`);
       }
 
-      const { client_secret, payment_intent_id } = await response.json();
+      const { collectionId } = await response.json();
 
-      // Redirect to Stripe payment page
-      const stripe = await stripePromise;
-      if (!stripe) {
-        throw new Error("Stripe kon niet worden geladen");
-      }
+      setSubmitStatus("Collectie succesvol aangemaakt!");
 
-      setPaymentStatus("Doorverwijzen naar betaling...");
-      
-      const { error } = await stripe.confirmIdealPayment(client_secret, {
-        payment_method: {
-          ideal: {},
-          billing_details: {
-            email: email,
-          },
-        },
-        return_url: `${window.location.origin}/payment-success?payment_intent=${payment_intent_id}&email=${encodeURIComponent(email)}`,
-      });
+      // Clear cart
+      dispatch(resetCart());
 
-      if (error) {
-        console.error("Payment failed:", error);
-        
-        // Handle different error types
-        if (error.type === 'card_error' && error.code === 'payment_intent_authentication_failure') {
-          setPaymentStatus("Betaling geannuleerd door gebruiker.");
-          // Redirect to cancellation page after a short delay
-          setTimeout(() => {
-            window.location.href = `/payment-canceled?payment_intent=${payment_intent_id}&reason=user_canceled`;
-          }, 2000);
-        } else if (error.type === 'card_error') {
-          // Handle specific card errors
-          const errorType = error.decline_code || error.code || 'card_error';
-          setPaymentStatus(`Betaling mislukt: ${error.message}`);
-          setTimeout(() => {
-            window.location.href = `/payment-failed?payment_intent=${payment_intent_id}&error_type=${errorType}&error_message=${encodeURIComponent(error.message || 'Unknown error')}`;
-          }, 2000);
-        } else {
-          setPaymentStatus(`Betaling mislukt: ${error.message}`);
-          setTimeout(() => {
-            window.location.href = `/payment-failed?payment_intent=${payment_intent_id}&error_type=unknown&error_message=${encodeURIComponent(error.message || 'Unknown error')}`;
-          }, 2000);
-        }
-      }
+      // Redirect to success page
+      setTimeout(() => {
+        window.location.href = `/submission-success?collection_id=${collectionId}&email=${encodeURIComponent(email)}`;
+      }, 1500);
+
     } catch (error) {
-      console.error("Error during payment:", error);
-      setPaymentStatus("Er is een fout opgetreden tijdens de betaling.");
+      console.error("Error during submission:", error);
+      setSubmitStatus("Er is een fout opgetreden. Probeer het opnieuw.");
     } finally {
       setLoading(false);
     }
@@ -124,17 +79,17 @@ const StripePayment = () => {
   return (
     <div className="p-10 w-full">
       <div className="flex flex-col items-center gap-3 sm:gap-6 lg:gap-8">
-        <button 
+        <button
           className="btn btn-outline rounded-full bg-darkText text-slate-100 px-2 py-2 text-sm flex items-center border-[2px] border-gray-400 hover:border-orange-600 duration-200 relative"
           onClick={() => dialogRef.current?.showModal()}
         >
-          Bestel deze Plantencollectie (€2,99)
+          Sla deze Plantencollectie op (gratis)
         </button>
-        
+
         <dialog ref={dialogRef} className="modal bg-white p-6 rounded border-[2px] border-black max-w-md">
-          <h2 className="text-xl font-bold mb-4">Bestel uw Plantencollectie</h2>
-          
-          <form onSubmit={handlePayment} className="space-y-4">
+          <h2 className="text-xl font-bold mb-4">Sla uw Plantencollectie op</h2>
+
+          <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="block text-sm font-medium mb-1">
                 Email adres
@@ -185,9 +140,9 @@ const StripePayment = () => {
               </div>
             </div>
 
-            {paymentStatus && (
+            {submitStatus && (
               <div className="text-center text-sm text-blue-600">
-                {paymentStatus}
+                {submitStatus}
               </div>
             )}
 
@@ -200,17 +155,12 @@ const StripePayment = () => {
               >
                 Annuleren
               </button>
-              <button 
-                type="submit" 
+              <button
+                type="submit"
                 className="btn btn-outline rounded-full bg-darkText text-slate-100 px-4 py-2 text-sm border-[2px] border-gray-400 hover:border-orange-600 duration-200"
-                disabled={loading || !stripePublishableKey}
+                disabled={loading}
               >
-                {!stripePublishableKey 
-                  ? "Stripe niet geconfigureerd" 
-                  : loading 
-                    ? "Verwerken..." 
-                    : "Betaal €2,99 met iDEAL"
-                }
+                {loading ? "Verwerken..." : "Opslaan (gratis)"}
               </button>
             </div>
           </form>
@@ -220,4 +170,4 @@ const StripePayment = () => {
   );
 };
 
-export default StripePayment;
+export default CollectionSubmission;

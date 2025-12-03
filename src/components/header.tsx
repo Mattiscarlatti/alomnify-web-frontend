@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Container from "./container";
 import Logo from "./logo";
 import { IoIosFolderOpen } from "react-icons/io";
@@ -9,9 +9,27 @@ import Link from "next/link";
 
 const Header = () => {
   const { floraData } = useSelector((state: StateProps) => state.shopping);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const isScrolled = window.scrollY > 50;
+      if (isScrolled !== scrolled) {
+        setScrolled(isScrolled);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [scrolled]);
 
   return (
-    <div className="bg-header h-20 top-0 sticky">
+    <div
+      className={`bg-header h-20 top-0 sticky transition-all duration-300 ease-in-out ${
+        scrolled ? 'shadow-lg backdrop-blur-lg bg-opacity-95' : ''
+      }`}
+      style={{ zIndex: 'var(--z-header)' }}
+    >
       <Container className="h-20 flex items-center md:gap-x-1 justify-between md:justify-start">
         <Logo />
         <div className="w-full items-center gap-x-1 group"> </div>

@@ -1,3 +1,45 @@
 @import "./base.css";
 @tailwind components;
 @tailwind utilities;
+
+/* Z-Index Management System */
+:root {
+  --z-dropdown: 1000;
+  --z-sticky: 1020;
+  --z-fixed: 1030;
+  --z-modal-backdrop: 1040;
+  --z-modal: 1050;
+  --z-popover: 1060;
+  --z-tooltip: 1070;
+  --z-header: 1080;
+  --z-notification: 1090;
+}
+
+/* Smooth scroll behavior */
+html {
+  scroll-behavior: smooth;
+}
+
+main {
+  scroll-snap-type: y proximity;
+}
+
+/* Content sections */
+.content-section {
+  position: relative;
+  z-index: 1;
+  scroll-snap-align: start;
+  scroll-margin-top: 80px;
+}
+
+/* Animate on scroll base styles */
+.animate-on-scroll {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.animate-on-scroll.visible {
+  opacity: 1;
+  transform: translateY(0);
+}

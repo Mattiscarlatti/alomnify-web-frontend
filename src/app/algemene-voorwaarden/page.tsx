@@ -125,20 +125,42 @@ export default function AlgemeneVoorwaardenPage() {
             </section>
 
             <section>
-              <h2 className="text-xl font-bold text-gray-900 mb-4">7. Aansprakelijkheid</h2>
-              
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">7.1 Beperking van aansprakelijkheid</h3>
+              <h2 className="text-xl font-bold text-gray-900 mb-4">7. Aansprakelijkheid en Disclaimers</h2>
+
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">7.1 Eetbaarheidsinformatie - Belangrijke disclaimer</h3>
+              <div className="text-gray-700 leading-relaxed mb-4 bg-yellow-50 border-l-4 border-yellow-400 p-4">
+                <strong className="text-yellow-800">LET OP:</strong> De website bevat informatie over de eetbaarheid van planten.
+                Deze eetbaarheidsinformatie is <strong>NIET</strong> gecontroleerd en mag <strong>NIET</strong> worden gebruikt als enige basis voor consumptie.<br/><br/>
+
+                <strong>U bent zelf volledig verantwoordelijk voor:</strong><br/>
+                • Het verifiëren van eetbaarheidsinformatie via betrouwbare bronnen<br/>
+                • Het correct identificeren van planten voordat u deze consumeert<br/>
+                • Het controleren op allergieën en persoonlijke gezondheidsrisico's<br/>
+                • Het raadplegen van experts bij twijfel<br/><br/>
+
+                <strong className="text-red-600">Alomnify aanvaardt GEEN enkele aansprakelijkheid voor:</strong><br/>
+                • Gezondheidsproblemen, vergiftiging of andere schade als gevolg van het consumeren van planten<br/>
+                • Onjuiste identificatie of onjuiste eetbaarheidsinformatie<br/>
+                • Allergische reacties of bijwerkingen<br/>
+                • Enige schade voortvloeiend uit het gebruik van eetbaarheidsinformatie op deze website<br/><br/>
+
+                Gebruik deze informatie uitsluitend ter informatie en voer altijd een grondige controle uit via meerdere
+                betrouwbare bronnen voordat u plantenmateriaal consumeert.
+              </div>
+
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">7.2 Beperking van aansprakelijkheid</h3>
               <div className="text-gray-700 leading-relaxed mb-4">
-                Onze aansprakelijkheid is beperkt tot het bedrag van uw aankoop (€2,99). 
+                Onze aansprakelijkheid is beperkt tot het bedrag van uw aankoop (€2,99).
                 Wij zijn niet aansprakelijk voor:<br/><br/>
                 • Indirecte schade of gevolgschade<br/>
                 • Verlies van winst of inkomsten<br/>
                 • Verlies van toegang tot collectielinks door eigen handelen<br/>
                 • Schade door externe services (Stripe, hosting providers)<br/>
-                • Technische storingen buiten onze controle
+                • Technische storingen buiten onze controle<br/>
+                • Onjuistheden in plantinformatie of -data
               </div>
 
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">7.2 Force majeure</h3>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">7.3 Force majeure</h3>
               <div className="text-gray-700 leading-relaxed">
                 Wij zijn niet aansprakelijk voor vertragingen of tekortkomingen door omstandigheden buiten onze redelijke controle, zoals netwerkuitval, serveruitval, of overmacht.
               </div>

@@ -89,6 +89,10 @@ const PlantCollectionPage = ({ initialCollectionId }: PlantCollectionPageProps) 
   const [aantalInh, setAantalInh] = useState<number>();
   const [aantalBloei, setAantalBloei] = useState< { name: string; value: number}[]>([]);
   const [aantalEet, setAantalEet] = useState< { name: string; value: number}[]>([]);
+  const [error, setError] = useState<string>('');
+  const [activeTab, setActiveTab] = useState<'statistics' | 'photos'>('statistics');
+  const [plantPhotos, setPlantPhotos] = useState<Record<number, string>>({});
+  const [loadingPhotos, setLoadingPhotos] = useState(false);
 
   const handleClick2 = () => {
     setTxh(inputValue);
@@ -109,6 +113,7 @@ const PlantCollectionPage = ({ initialCollectionId }: PlantCollectionPageProps) 
   }, [initialCollectionId]);
 
   const fetchMetadata = async (collectionId: string) => {
+    setError(''); // Clear previous errors
     try {
         const response = await fetch(`https://alomnify-api-production.alomnify.workers.dev/api/collections?id=${collectionId}`, {
           method: "GET",
@@ -116,18 +121,29 @@ const PlantCollectionPage = ({ initialCollectionId }: PlantCollectionPageProps) 
             "Content-Type": "application/json",
           },
         });
-        
+
         if (!response.ok) {
-          throw new Error(`Error: ${response.status}`);
+          if (response.status === 404) {
+            throw new Error('Collectie niet gevonden. Controleer of het collectie ID correct is.');
+          } else if (response.status === 400) {
+            throw new Error('Ongeldig collectie ID formaat.');
+          } else {
+            throw new Error(`Er is een fout opgetreden bij het ophalen van de collectie (Error: ${response.status}).`);
+          }
         }
-        
+
         const data = await response.json();
         const collection = data.collection;
-        
+
+        if (!collection) {
+          throw new Error('Geen collectiegegevens ontvangen.');
+        }
+
         setPlanten(collection.plantIds);
         setFactors(collection.environmentalFactors);
-      } catch (error) {
+      } catch (error: any) {
         console.error('Error fetching collection:', error);
+        setError(error.message || 'Er is een onbekende fout opgetreden bij het laden van de collectie.');
     }
   };
   
@@ -311,6 +327,59 @@ const PlantCollectionPage = ({ initialCollectionId }: PlantCollectionPageProps) 
     be_dreigd: data.be_dreigd,
   });
 
+  // Fetch plant photo from Flickr API
+  const fetchPlantPhoto = async (plantName: string, plantId: number) => {
+    const apiKey = process.env.NEXT_PUBLIC_FLICKR_KEY;
+
+    if (!apiKey) {
+      console.error('Flickr API key not found');
+      return null;
+    }
+
+    try {
+      // Search for photos using the plant's latin name
+      const searchUrl = `https://api.flickr.com/services/rest/?method=flickr.photos.search&api_key=${apiKey}&text=${encodeURIComponent(plantName)}&sort=relevance&per_page=1&format=json&nojsoncallback=1&content_type=1&media=photos`;
+
+      const response = await fetch(searchUrl);
+      const data = await response.json();
+
+      if (data.photos && data.photos.photo && data.photos.photo.length > 0) {
+        const photo = data.photos.photo[0];
+        // Construct photo URL: https://live.staticflickr.com/{server-id}/{id}_{secret}_{size-suffix}.jpg
+        const photoUrl = `https://live.staticflickr.com/${photo.server}/${photo.id}_${photo.secret}_w.jpg`;
+        return photoUrl;
+      }
+
+      return null;
+    } catch (error) {
+      console.error(`Error fetching photo for ${plantName}:`, error);
+      return null;
+    }
+  };
+
+  // Load all plant photos when photos tab is activated
+  useEffect(() => {
+    if (activeTab === 'photos' && floras.length > 0 && Object.keys(plantPhotos).length === 0) {
+      setLoadingPhotos(true);
+
+      Promise.all(
+        floras.map(async (plant) => {
+          const photoUrl = await fetchPlantPhoto(plant.latin_name, plant.id);
+          return { id: plant.id, url: photoUrl };
+        })
+      ).then((results) => {
+        const photosMap: Record<number, string> = {};
+        results.forEach(({ id, url }) => {
+          if (url) {
+            photosMap[id] = url;
+          }
+        });
+        setPlantPhotos(photosMap);
+        setLoadingPhotos(false);
+      });
+    }
+  }, [activeTab, floras]);
+
   const handleAPI2 = (lijst: Flora2[]) => {
     lijst.map(x => dispatch(addToCart(convertToFlora(x))));
   };
@@ -318,11 +387,30 @@ const PlantCollectionPage = ({ initialCollectionId }: PlantCollectionPageProps) 
   return (
     <Container>
     <div className="grid grid-cols-1 gap-6 bg-white/30 p-12 shadow-xl ring-1 ring-gray-900/5 rounded-lg backdrop-blur-lg mx-auto w-full">
-      { txH && 
+      { txH &&
         <div className="grid grid-cols-4 px-3 py-2">
           <p className="flex flex-col col-span-4 rounded-l-xl items-center justify-center gap-x-1 px-3 py-1">De resultaten worden getoond van PlantenCollectie ID: {txH}</p>
         </div>
       }
+
+      {/* Error message display */}
+      {error && (
+        <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-4">
+          <div className="flex">
+            <div className="flex-shrink-0">
+              <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+              </svg>
+            </div>
+            <div className="ml-3">
+              <p className="text-sm text-red-700">
+                <strong>Fout bij het laden van de collectie:</strong> {error}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="grid grid-cols-3 px-3 py-2 items-center">
         <button onClick={handleClick2} className="col-span-1 bg-black rounded-l-xl hover:bg-slate-950 text-xs sm:text-base text-slate-100 hover:text-white flex items-center justify-center px-1 sm:px-3 py-1 border-[2px] border-gray-400 hover:border-orange-600 duration-200 relative">Laad PlantenCollectie uit Collectie ID</button>
         <input 
@@ -335,7 +423,35 @@ const PlantCollectionPage = ({ initialCollectionId }: PlantCollectionPageProps) 
         />
         <button className="w-full col-span-1 bg-black rounded-r-xl hover:bg-slate-950 text-slate-100 hover:text-white flex items-center justify-center gap-x-1 px-3 py-1 border-[2px] border-gray-400 hover:border-orange-600 duration-200 relative" onClick={() => handleAPI2(floras)}>Collectie updaten/toevoegen aan folder</button>
       </div>
-      { aantalEetbaar &&  
+
+      {/* Tab Navigation */}
+      { aantalEetbaar && (
+        <div className="flex border-b border-gray-300 mb-6">
+          <button
+            onClick={() => setActiveTab('statistics')}
+            className={`px-6 py-3 font-medium transition-colors ${
+              activeTab === 'statistics'
+                ? 'border-b-2 border-orange-600 text-orange-600'
+                : 'text-gray-600 hover:text-gray-900'
+            }`}
+          >
+            Statistieken
+          </button>
+          <button
+            onClick={() => setActiveTab('photos')}
+            className={`px-6 py-3 font-medium transition-colors ${
+              activeTab === 'photos'
+                ? 'border-b-2 border-orange-600 text-orange-600'
+                : 'text-gray-600 hover:text-gray-900'
+            }`}
+          >
+            Fotoimpressie
+          </button>
+        </div>
+      )}
+
+      {/* Statistics Tab Content */}
+      { aantalEetbaar && activeTab === 'statistics' &&
         <div className="relative w-full h-[200px] flex items-center bg-gray-200"> 
         <Banner2 
             plantendata0={{
@@ -353,7 +469,7 @@ const PlantCollectionPage = ({ initialCollectionId }: PlantCollectionPageProps) 
             }}
       /></div>
       }
-      { aantalEetbaar &&
+      { aantalEetbaar && activeTab === 'statistics' &&
         <div className="grid grid-cols-2">
           <div className="flex flex-col items-center justify-center gap-2 pb-28"><p className="">Bloeiende Planten</p><ChartBloei plantendata4={aantalBloei as any[]} /></div>
           <div className="flex flex-col items-center justify-center gap-2 pb-28"><p className="">Kwetsbaarheid van Inheemsen</p><ChartBedreigd plantendata3={aantalBedreigd as any[]} /></div>
@@ -361,7 +477,7 @@ const PlantCollectionPage = ({ initialCollectionId }: PlantCollectionPageProps) 
           <div className="flex flex-col items-center justify-center gap-2 pb-14"><p className="">Type Planten</p><ChartPlantTypen plantendata1={aantalType as any[]} /></div>
         </div>
       }
-      { aantalEetbaar && 
+      { aantalEetbaar && activeTab === 'statistics' &&
         <div>
           <table className="table-auto border-collapse border border-gray-400 w-full text-left">
             <thead>
@@ -373,7 +489,6 @@ const PlantCollectionPage = ({ initialCollectionId }: PlantCollectionPageProps) 
                 <th className="border border-gray-300 px-2 py-2">Bedreigd</th>
                 <th className="border border-gray-300 px-2 py-2">Inheems</th>
                 <th className="border border-gray-300 px-2 py-2">Eetbaar</th>
-                <th className="border border-gray-300 px-2 py-2">Bloemkleur</th>
                 <th className="border border-gray-300 px-2 py-2">Bloeimaanden</th>
                 <th className="border border-gray-300 px-2 py-2">Groenblijvend</th>
               </tr>
@@ -388,7 +503,6 @@ const PlantCollectionPage = ({ initialCollectionId }: PlantCollectionPageProps) 
                   <td className="border border-gray-300 px-2 py-2">{flor?.be_dreigd}</td>
                   <td className="border border-gray-300 px-2 py-2">{flor?.in_heems}</td>
                   <td className="border border-gray-300 px-2 py-2">{flor?.eet_baar}</td>
-                  <td className="border border-gray-300 px-2 py-2">{flor?.bloem_kleur}</td>
                   <td className="border border-gray-300 px-2 py-2">{flor?.bloei_tijd}</td>
                   <td className="border border-gray-300 px-2 py-2">{flor?.groen_blijvend}</td>
                 </tr>
@@ -397,6 +511,71 @@ const PlantCollectionPage = ({ initialCollectionId }: PlantCollectionPageProps) 
           </table>
         </div>
       }
+
+      {/* Photos Tab Content */}
+      { aantalEetbaar && activeTab === 'photos' && (
+        <div className="w-full">
+          <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">Fotoimpressie van uw Plantencollectie</h2>
+
+          {loadingPhotos && (
+            <div className="text-center mb-8">
+              <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-orange-600"></div>
+              <p className="text-gray-600 mt-2">Foto's worden geladen via Flickr...</p>
+            </div>
+          )}
+
+          {/* Photo Gallery */}
+          <div className="relative bg-white p-6 rounded-lg shadow-lg">
+            {floras.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {floras.map((plant) => (
+                  <div key={plant.id} className="relative bg-gray-100 rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-shadow">
+                    <div className="aspect-square bg-gray-200 flex items-center justify-center overflow-hidden">
+                      {plantPhotos[plant.id] ? (
+                        <img
+                          src={plantPhotos[plant.id]}
+                          alt={plant.dutch_name || plant.latin_name}
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            // Fallback if image fails to load
+                            const target = e.target as HTMLImageElement;
+                            target.style.display = 'none';
+                            if (target.nextElementSibling) {
+                              (target.nextElementSibling as HTMLElement).style.display = 'flex';
+                            }
+                          }}
+                        />
+                      ) : null}
+                      <div
+                        className={`absolute inset-0 flex items-center justify-center bg-gray-200 ${plantPhotos[plant.id] ? 'hidden' : 'flex'}`}
+                      >
+                        {loadingPhotos ? (
+                          <div className="animate-pulse text-gray-400">Laden...</div>
+                        ) : (
+                          <p className="text-gray-500 text-center p-4 text-sm">
+                            Geen foto beschikbaar voor<br/>
+                            <span className="font-semibold">{plant.dutch_name || plant.latin_name}</span>
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                    <div className="p-4 bg-white">
+                      <h3 className="font-semibold text-gray-900 text-sm">{plant.dutch_name}</h3>
+                      <p className="text-xs text-gray-600 italic">{plant.latin_name}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-center text-gray-500">Geen planten gevonden in deze collectie</p>
+            )}
+          </div>
+
+          <p className="text-center text-xs text-gray-500 mt-4">
+            Foto's afkomstig van Flickr. Sommige planten hebben mogelijk geen beschikbare foto.
+          </p>
+        </div>
+      )}
     </div>
     </Container>
   );

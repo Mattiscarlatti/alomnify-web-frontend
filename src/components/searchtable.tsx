@@ -41,99 +41,39 @@ const SearchTable = () => {
       if (selectedOption === 'dutchnam') searchType = 'dutch';
       if (selectedOption === 'latinnam') searchType = 'latin';
 
-      let transformedResults: Flora[] = [];
+      // Build URL parameters including filters
+      const params = new URLSearchParams({
+        search: query,
+        searchType: searchType,
+        limit: '2000'
+      });
 
-      // If no query but filters are active, fetch multiple common letters to get broader results
-      if (query.length === 0 && hasActiveFilters) {
-        const commonLetters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'];
-        const allResults: Flora[] = [];
-        const seenIds = new Set<number>();
-
-        for (const letter of commonLetters) {
-          const params = new URLSearchParams({
-            search: letter,
-            searchType: searchType,
-            limit: '500'
-          });
-
-          const response = await fetch(`https://alomnify-api-production.alomnify.workers.dev/api/plants?${params}`);
-          if (response.ok) {
-            const data = await response.json();
-            // Add unique results
-            data.plants.forEach((plant: Flora) => {
-              if (!seenIds.has(plant.id)) {
-                seenIds.add(plant.id);
-                allResults.push(plant);
-              }
-            });
-          }
-        }
-        transformedResults = allResults;
-      } else {
-        // Normal search with query
-        const params = new URLSearchParams({
-          search: query,
-          searchType: searchType,
-          limit: '500'
-        });
-
-        const response = await fetch(`https://alomnify-api-production.alomnify.workers.dev/api/plants?${params}`);
-
-        if (!response.ok) {
-          throw new Error(`Error: ${response.status}`);
-        }
-
-        const data = await response.json();
-        transformedResults = data.plants;
+      // Add filter parameters if active
+      if (selectedMonths.length > 0) {
+        params.append('months', selectedMonths.join(','));
+      }
+      if (selectedEdibleParts.length > 0) {
+        params.append('edibleParts', selectedEdibleParts.join(','));
+      }
+      if (selectedThreatLevels.length > 0) {
+        params.append('threatLevels', selectedThreatLevels.join(','));
+      }
+      if (filterEvergreen) {
+        params.append('evergreen', 'true');
+      }
+      if (filterNative) {
+        params.append('native', 'true');
       }
 
-      // Apply client-side filters
-      if (hasActiveFilters) {
-        transformedResults = transformedResults.filter((plant: Flora) => {
-          // Filter by months - check if plant blooms in any of the selected months
-          if (selectedMonths.length > 0) {
-            const hasSelectedMonth = selectedMonths.some(month => {
-              // Match month as a whole word with word boundaries
-              // This matches " 1 ", " 1", "1 ", or just "1" if it's alone
-              const regex = new RegExp(`(^|\\s)${month}(\\s|$)`);
-              return regex.test(plant.bloei_tijd);
-            });
-            if (!hasSelectedMonth) return false;
-          }
+      // Make single API call with all filters
+      const response = await fetch(`https://alomnify-api-production.alomnify.workers.dev/api/plants?${params}`);
 
-          // Filter by edible parts
-          if (selectedEdibleParts.length > 0) {
-            const hasSelectedPart = selectedEdibleParts.some(part =>
-              plant.eet_baar.toLowerCase().includes(part.toLowerCase())
-            );
-            if (!hasSelectedPart) return false;
-          }
-
-          // Filter by threat level - exact match to avoid confusion between "bedreigd" and "ernstig bedreigd"
-          if (selectedThreatLevels.length > 0) {
-            const hasSelectedThreat = selectedThreatLevels.some(threat => {
-              // Trim spaces and do exact comparison
-              const plantThreat = plant.be_dreigd.trim();
-              return plantThreat === threat;
-            });
-            if (!hasSelectedThreat) return false;
-          }
-
-          // Filter by evergreen
-          if (filterEvergreen && plant.groen_blijvend !== 'groenblijvend') {
-            return false;
-          }
-
-          // Filter by native (inheems)
-          if (filterNative && plant.in_heems.trim() !== 'inheems') {
-            return false;
-          }
-
-          return true;
-        });
+      if (!response.ok) {
+        throw new Error(`Error: ${response.status}`);
       }
 
-      setResults(transformedResults);
+      const data = await response.json();
+      setResults(data.plants);
     } catch (err: any) {
       setError(err.message);
     }

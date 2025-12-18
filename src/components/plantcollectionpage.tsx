@@ -93,6 +93,7 @@ const PlantCollectionPage = ({ initialCollectionId }: PlantCollectionPageProps) 
   const [activeTab, setActiveTab] = useState<'statistics' | 'photos'>('statistics');
   const [plantPhotos, setPlantPhotos] = useState<Record<number, string>>({});
   const [loadingPhotos, setLoadingPhotos] = useState(false);
+  const [plantsWithoutPhotos, setPlantsWithoutPhotos] = useState<Flora2[]>([]);
 
   const handleClick2 = () => {
     setTxh(inputValue);
@@ -365,16 +366,22 @@ const PlantCollectionPage = ({ initialCollectionId }: PlantCollectionPageProps) 
       Promise.all(
         floras.map(async (plant) => {
           const photoUrl = await fetchPlantPhoto(plant.latin_name, plant.id);
-          return { id: plant.id, url: photoUrl };
+          return { id: plant.id, url: photoUrl, plant };
         })
       ).then((results) => {
         const photosMap: Record<number, string> = {};
-        results.forEach(({ id, url }) => {
+        const plantsWithoutPhotosArray: Flora2[] = [];
+
+        results.forEach(({ id, url, plant }) => {
           if (url) {
             photosMap[id] = url;
+          } else {
+            plantsWithoutPhotosArray.push(plant);
           }
         });
+
         setPlantPhotos(photosMap);
+        setPlantsWithoutPhotos(plantsWithoutPhotosArray);
         setLoadingPhotos(false);
       });
     }
@@ -528,43 +535,23 @@ const PlantCollectionPage = ({ initialCollectionId }: PlantCollectionPageProps) 
           <div className="relative bg-white p-6 rounded-lg shadow-lg">
             {floras.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {floras.map((plant) => (
-                  <div key={plant.id} className="relative bg-gray-100 rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-shadow">
-                    <div className="aspect-square bg-gray-200 flex items-center justify-center overflow-hidden">
-                      {plantPhotos[plant.id] ? (
+                {floras
+                  .filter((plant) => plantPhotos[plant.id])
+                  .map((plant) => (
+                    <div key={plant.id} className="relative bg-gray-100 rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-shadow">
+                      <div className="aspect-square bg-gray-200 flex items-center justify-center overflow-hidden">
                         <img
                           src={plantPhotos[plant.id]}
                           alt={plant.dutch_name || plant.latin_name}
                           className="w-full h-full object-cover"
-                          onError={(e) => {
-                            // Fallback if image fails to load
-                            const target = e.target as HTMLImageElement;
-                            target.style.display = 'none';
-                            if (target.nextElementSibling) {
-                              (target.nextElementSibling as HTMLElement).style.display = 'flex';
-                            }
-                          }}
                         />
-                      ) : null}
-                      <div
-                        className={`absolute inset-0 flex items-center justify-center bg-gray-200 ${plantPhotos[plant.id] ? 'hidden' : 'flex'}`}
-                      >
-                        {loadingPhotos ? (
-                          <div className="animate-pulse text-gray-400">Laden...</div>
-                        ) : (
-                          <p className="text-gray-500 text-center p-4 text-sm">
-                            Geen foto beschikbaar voor<br/>
-                            <span className="font-semibold">{plant.dutch_name || plant.latin_name}</span>
-                          </p>
-                        )}
+                      </div>
+                      <div className="p-4 bg-white">
+                        <h3 className="font-semibold text-gray-900 text-sm">{plant.dutch_name}</h3>
+                        <p className="text-xs text-gray-600 italic">{plant.latin_name}</p>
                       </div>
                     </div>
-                    <div className="p-4 bg-white">
-                      <h3 className="font-semibold text-gray-900 text-sm">{plant.dutch_name}</h3>
-                      <p className="text-xs text-gray-600 italic">{plant.latin_name}</p>
-                    </div>
-                  </div>
-                ))}
+                  ))}
               </div>
             ) : (
               <p className="text-center text-gray-500">Geen planten gevonden in deze collectie</p>
@@ -572,8 +559,32 @@ const PlantCollectionPage = ({ initialCollectionId }: PlantCollectionPageProps) 
           </div>
 
           <p className="text-center text-xs text-gray-500 mt-4">
-            Foto's afkomstig van Flickr. Sommige planten hebben mogelijk geen beschikbare foto.
+            Foto's afkomstig van Flickr.
           </p>
+
+          {/* Show plants without photos */}
+          {!loadingPhotos && plantsWithoutPhotos.length > 0 && (
+            <div className="bg-amber-50 border-l-4 border-amber-500 p-4 mt-4">
+              <div className="flex">
+                <div className="flex-shrink-0">
+                  <svg className="h-5 w-5 text-amber-400" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <div className="ml-3">
+                  <p className="text-sm text-amber-700">
+                    <strong>Let op:</strong> Voor de volgende {plantsWithoutPhotos.length} {plantsWithoutPhotos.length === 1 ? 'plant' : 'planten'} kon geen foto worden geladen: {' '}
+                    {plantsWithoutPhotos.map((plant, index) => (
+                      <span key={plant.id}>
+                        {plant.dutch_name || plant.latin_name}
+                        {index < plantsWithoutPhotos.length - 1 ? ', ' : ''}
+                      </span>
+                    ))}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       )}
     </div>

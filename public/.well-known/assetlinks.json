@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.alomnify.mobile",
+      "sha256_cert_fingerprints": [
+        "0B:A4:96:D7:B6:49:E5:D5:4E:7B:65:34:E4:52:67:5B:54:0E:2F:4D:84:80:7D:3E:7A:7E:82:29:31:7C:72:A3"
+      ]
+    }
+  }
+]

@@ -1,0 +1,11 @@
+{
+  "applinks": {
+    "apps": [],
+    "details": [
+      {
+        "appID": "7DVW7726Z4.com.alomnify.mobile",
+        "paths": ["/collection/*"]
+      }
+    ]
+  }
+}

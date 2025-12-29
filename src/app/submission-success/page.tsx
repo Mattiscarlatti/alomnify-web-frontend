@@ -61,7 +61,7 @@ export default function SubmissionSuccess() {
               en gebruik uw collectie-ID om uw collectie op te vragen.
             </p>
             <p className="text-sm text-yellow-700">
-              Collectie-ID: <code className="bg-yellow-200 px-1 rounded">{collectionId}</code>
+              Collectie-ID: <code className="bg-yellow-200 px-1 rounded break-all">{collectionId}</code>
             </p>
           </div>
         )}
@@ -81,8 +81,8 @@ export default function SubmissionSuccess() {
         </button>
 
         <div className="mt-6 pt-4 border-t text-sm text-gray-500">
-          <p>Collectie-ID: {collectionId}</p>
-          {email && <p>Email: {email}</p>}
+          <p className="break-all">Collectie-ID: {collectionId}</p>
+          {email && <p className="break-all">Email: {email}</p>}
         </div>
       </div>
     </div>

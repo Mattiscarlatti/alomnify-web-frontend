@@ -12,28 +12,27 @@ export default function PrivacybeleidPage() {
 
           <div className="space-y-8">
             <section>
-              <h2 className="text-xl font-bold text-gray-900 mb-4">1. Inleiding</h2>
+              <h2 className="text-xl font-bold text-gray-900 mb-4">1. Introductie</h2>
               <div className="text-gray-700 leading-relaxed">
-                Alomnify respecteert uw privacy en is toegewijd aan het beschermen van uw persoonlijke gegevens. 
-                Dit privacybeleid legt uit hoe wij omgaan met uw gegevens bij gebruik van onze website.
+                Alomnify respecteert je privacy en beschermt je persoonlijke gegevens.
+                Dit privacybeleid legt uit welke gegevens we verzamelen en hoe we deze gebruiken.
               </div>
             </section>
 
             <section>
               <h2 className="text-xl font-bold text-gray-900 mb-4">2. Welke gegevens verzamelen we?</h2>
-              
+
               <h3 className="text-lg font-semibold text-gray-900 mb-2">2.1 Persoonlijke gegevens</h3>
               <div className="text-gray-700 leading-relaxed mb-4">
-                • Email adres (verplicht voor orderbevestigingen)<br/>
-                • Betalingsgegevens (verwerkt door Stripe)
+                • Email adres (verplicht voor bevestigingen van opgeslagen collecties)
               </div>
 
               <h3 className="text-lg font-semibold text-gray-900 mb-2">2.2 Technische gegevens</h3>
               <div className="text-gray-700 leading-relaxed mb-4">
                 • Browser informatie (automatisch verzameld voor website functionaliteit)<br/>
-                • IP adres (niet verzameld door deze website, maar servers van Stripe en hosting loggen dit automatisch)<br/>
+                • IP adres (niet door ons verzameld, maar hosting servers loggen dit automatisch)<br/>
                 • Cookies (zie sectie 7)<br/>
-                • Plantencollectie data (tijdelijke opslag in browser voor winkelmandje functionaliteit)
+                • Plantencollectie data (tijdelijke opslag in je browser)
               </div>
 
               <h3 className="text-lg font-semibold text-gray-900 mb-2">2.3 Collectiegegevens</h3>
@@ -45,132 +44,123 @@ export default function PrivacybeleidPage() {
             </section>
 
             <section>
-              <h2 className="text-xl font-bold text-gray-900 mb-4">3. Hoe gebruiken we uw gegevens?</h2>
+              <h2 className="text-xl font-bold text-gray-900 mb-4">3. Waarom verzamelen we dit?</h2>
               <div className="text-gray-700 leading-relaxed">
-                Wij gebruiken uw gegevens om:<br/><br/>
-                • Uw plantencollectie anoniem op te slaan<br/>
-                • Orderbevestigingen te versturen<br/>
-                • De website functionaliteit te bieden<br/>
-                • Klantenservice te bieden (nadat u ons heeft gecontacteerd)<br/>
-                • Wettelijke verplichtingen na te komen
+                We gebruiken je gegevens om:<br/><br/>
+                • Je plantencollectie anoniem op te slaan<br/>
+                • Bevestigingsmails te versturen<br/>
+                • De website goed te laten werken<br/>
+                • Klantenservice te bieden (als je contact met ons opneemt)<br/>
+                • Aan wettelijke verplichtingen te voldoen
               </div>
             </section>
 
             <section>
-              <h2 className="text-xl font-bold text-gray-900 mb-4">4. Delen van gegevens</h2>
-              <div className="text-gray-700 leading-relaxed mb-4">
-                Wij delen uw gegevens met:
-              </div>
-              
+              <h2 className="text-xl font-bold text-gray-900 mb-4">4. Met wie delen we gegevens?</h2>
+
               <h3 className="text-lg font-semibold text-gray-900 mb-2">4.1 Derde partijen</h3>
               <div className="text-gray-700 leading-relaxed mb-4">
-                • Stripe (betalingsverwerking) - PCI DSS gecertificeerd<br/>
-                • Cloudflare (database hosting - geen persoonlijke gegevens, alleen anonieme collectierecords)<br/>
-                • Email service providers (voor versturen orderbevestigingen en reageren op aangevraagde support)<br/>
-                • Vercel (website hosting)
+                We delen alleen gegevens met partijen die we nodig hebben om de service te draaien:<br/><br/>
+                • <strong>Cloudflare</strong> (database hosting - alleen anonieme collectierecords, geen persoonlijke gegevens)<br/>
+                • <strong>Vercel</strong> (website hosting)<br/>
+                • <strong>Email provider</strong> (voor versturen bevestigingsmails)<br/><br/>
+                Alle partijen zijn GDPR compliant en verwerken data in GDPR-veilige datacenters.
               </div>
 
               <h3 className="text-lg font-semibold text-gray-900 mb-2">4.2 Wettelijke vereisten</h3>
               <div className="text-gray-700 leading-relaxed">
-                Wij kunnen uw gegevens delen wanneer wettelijk verplicht of ter bescherming 
+                We kunnen je gegevens delen wanneer we wettelijk verplicht zijn of ter bescherming
                 van onze rechten, eigendom of veiligheid.
               </div>
             </section>
 
             <section>
-              <h2 className="text-xl font-bold text-gray-900 mb-4">5. Gegevensbeveiliging</h2>
+              <h2 className="text-xl font-bold text-gray-900 mb-4">5. Beveiliging</h2>
               <div className="text-gray-700 leading-relaxed">
-                Wij implementeren passende technische en organisatorische maatregelen:<br/><br/>
+                We implementeren passende beveiligingsmaatregelen:<br/><br/>
                 • HTTPS versleuteling voor alle communicatie<br/>
-                • Geen opslag van volledige betalingsgegevens<br/>
                 • Regelmatige beveiligingsupdates<br/>
                 • Toegangscontroles en monitoring<br/>
-                • Anonieme gegevensopslag zonder persoonlijke identificatie
+                • Anonieme gegevensopslag (collecties zijn niet gekoppeld aan personen)
               </div>
             </section>
 
             <section>
-              <h2 className="text-xl font-bold text-gray-900 mb-4">6. Uw rechten (GDPR)</h2>
+              <h2 className="text-xl font-bold text-gray-900 mb-4">6. Jouw rechten (GDPR)</h2>
               <div className="text-gray-700 leading-relaxed">
-                Als EU burger heeft u het recht om:<br/><br/>
-                • Uw gegevens in te zien (recht op toegang)<br/>
-                • Correcties aan te vragen (recht op rectificatie)<br/>
-                • Verwijdering te vragen (recht om vergeten te worden)<br/>
-                • Overdracht te vragen (recht op portabiliteit)<br/>
-                • Bezwaar te maken tegen verwerking<br/>
-                • Toestemming in te trekken
+                Als EU burger heb je recht op:<br/><br/>
+                • <strong>Inzage</strong> - Je gegevens bekijken<br/>
+                • <strong>Correctie</strong> - Onjuiste gegevens laten aanpassen<br/>
+                • <strong>Verwijdering</strong> - Je gegevens laten verwijderen (recht om vergeten te worden)<br/>
+                • <strong>Overdracht</strong> - Je gegevens in een bruikbaar formaat ontvangen<br/>
+                • <strong>Bezwaar</strong> - Bezwaar maken tegen verwerking<br/>
+                • <strong>Intrekking</strong> - Toestemming intrekken<br/><br/>
+
+                <strong>Gebruik maken van je rechten?</strong><br/>
+                Mail naar info@alomnify.nl - we reageren binnen 30 dagen.
               </div>
             </section>
 
             <section>
               <h2 className="text-xl font-bold text-gray-900 mb-4">7. Cookies en lokale opslag</h2>
-              <div className="text-gray-700 leading-relaxed">
-                Onze website gebruikt:<br/><br/>
-                
-                <strong>7.1 Lokale opslag (localStorage)</strong><br/>
-                • Winkelmandje inhoud (Redux Persist)<br/>
+
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">7.1 Wat we WEL gebruiken</h3>
+              <div className="text-gray-700 leading-relaxed mb-4">
+                <strong>Lokale opslag (localStorage)</strong><br/>
                 • Website instellingen en voorkeuren<br/>
                 • Tijdelijke plantencollectie data<br/><br/>
-                
-                <strong>7.2 Essentiële cookies</strong><br/>
-                • Next.js session cookies (website functionaliteit)<br/>
-                • Stripe betalingscookies (alleen tijdens checkout)<br/>
-                • Geen permanente tracking cookies<br/><br/>
-                
-                <strong>7.3 Wat we NIET gebruiken</strong><br/>
-                • Google Analytics of andere tracking<br/>
+
+                <strong>Essentiële cookies</strong><br/>
+                • Next.js session cookies (nodig voor website functionaliteit)<br/>
+                • Geen permanente tracking cookies
+              </div>
+
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">7.2 Wat we NIET gebruiken</h3>
+              <div className="text-gray-700 leading-relaxed">
+                • Google Analytics of andere tracking tools<br/>
                 • Advertentie cookies<br/>
                 • Social media tracking pixels<br/>
-                • Cross-site tracking cookies
+                • Cross-site tracking cookies<br/><br/>
+
+                We tracken je niet en verkopen je gegevens niet aan derden.
               </div>
             </section>
 
             <section>
-              <h2 className="text-xl font-bold text-gray-900 mb-4">8. Bewaarperiode</h2>
+              <h2 className="text-xl font-bold text-gray-900 mb-4">8. Hoe lang bewaren we gegevens?</h2>
               <div className="text-gray-700 leading-relaxed">
-                • Ordergegevens: 10 jaar (fiscale verplichting)<br/>
-                • Email adressen: Tot u vraagt om verwijdering<br/>
-                • Website data: Tot u uw browser cache leegt<br/>
-                • Collectierecords: Kunnen permanent worden bewaard, maar kunnen op verzoek worden verwijderd
+                • <strong>Email adressen:</strong> Tot je om verwijdering vraagt<br/>
+                • <strong>Browser data:</strong> Tot je je browser cache leegt<br/>
+                • <strong>Collectierecords:</strong> Kunnen permanent bewaard worden (continuïteit service),
+                  maar je kunt altijd om verwijdering vragen via je GDPR rechten
               </div>
             </section>
 
             <section>
-              <h2 className="text-xl font-bold text-gray-900 mb-4">9. Internationale overdrachten</h2>
+              <h2 className="text-xl font-bold text-gray-900 mb-4">9. Wijzigingen</h2>
               <div className="text-gray-700 leading-relaxed">
-                Uw gegevens kunnen worden verwerkt buiten de EU door:<br/><br/>
-                • Stripe (VS - Privacy Shield gecertificeerd)<br/>
-                • Cloudflare (VS - GDPR compliant)<br/>
-                • Vercel (VS - GDPR compliant)<br/><br/>
-                Alle overdrachten voldoen aan GDPR vereisten.
+                We kunnen dit privacybeleid aanpassen. Bij belangrijke wijzigingen informeren we je
+                via email of een melding op de website.
               </div>
             </section>
 
             <section>
               <h2 className="text-xl font-bold text-gray-900 mb-4">10. Contact</h2>
               <div className="text-gray-700 leading-relaxed">
-                Voor vragen over dit privacybeleid of uw gegevens:<br/><br/>
+                Vragen over dit privacybeleid of je gegevens?<br/><br/>
                 <strong>Alomnify CV</strong><br/>
                 Gluvinksweg 6<br/>
                 7751 SM Dalen<br/>
                 KvK: 98348124<br/>
                 BTW: NL868458077B01<br/>
                 Email: info@alomnify.nl<br/>
-                Reactietijd: Binnen 30 dagen<br/>
-              </div>
-            </section>
-
-            <section>
-              <h2 className="text-xl font-bold text-gray-900 mb-4">11. Wijzigingen</h2>
-              <div className="text-gray-700 leading-relaxed">
-                Wij kunnen dit privacybeleid bijwerken. Bij belangrijke wijzigingen 
-                informeren wij u via email of een melding op de website.
+                Reactietijd: Binnen 30 dagen (GDPR verzoeken)
               </div>
             </section>
 
             <div className="mt-12 pt-8 border-t border-gray-200 text-center">
               <p className="text-sm text-gray-600">
-                Dit beleid is opgesteld conform de AVG/GDPR wetgeving
+                Dit beleid voldoet aan de AVG/GDPR wetgeving
               </p>
             </div>
           </div>

@@ -18,9 +18,9 @@ import { Flora, Flora2 } from "../../type";
 function calculateFactorScore(records: Record<string, number>): number {
   let score = 1;
   const multiplierMap: Record<string, number> = {
-    watr: 1.2,
-    kalkst: 1.2,
-    rommel: 1.1,
+    watr: 1.07,
+    kalkst: 1.07,
+    rommel: 1.07,
   };
   for (const key in records) {
     if (records[key] === 1 && multiplierMap[key]) {
@@ -94,10 +94,28 @@ const PlantCollectionPage = ({ initialCollectionId }: PlantCollectionPageProps) 
   const [plantPhotos, setPlantPhotos] = useState<Record<number, string>>({});
   const [loadingPhotos, setLoadingPhotos] = useState(false);
   const [plantsWithoutPhotos, setPlantsWithoutPhotos] = useState<Flora2[]>([]);
+  const [isExampleCollection, setIsExampleCollection] = useState(false);
 
   const handleClick2 = () => {
     setTxh(inputValue);
+    setIsExampleCollection(false); // Reset example flag when loading custom collection
     fetchMetadata(inputValue);
+  };
+
+  const handleLoadExampleCollection = () => {
+    const exampleId = 'e1luf6vVAq9FVGYfS9woaenFTTFVoSMgQbogNZwl3FjZnNGUAhf9G2L5DhhAf115';
+    setInputValue(exampleId);
+    setTxh(exampleId);
+    setIsExampleCollection(true); // Mark as example collection
+    fetchMetadata(exampleId);
+  };
+
+  const handleSaveCollection = () => {
+    if (isExampleCollection) {
+      alert('De voorbeeldcollectie kan niet worden opgeslagen. Maak uw eigen collectie aan om deze op te slaan in uw folder.');
+      return;
+    }
+    handleAPI2(floras);
   };
 
   useEffect(() => {
@@ -418,17 +436,46 @@ const PlantCollectionPage = ({ initialCollectionId }: PlantCollectionPageProps) 
         </div>
       )}
 
-      <div className="grid grid-cols-3 px-3 py-2 items-center">
-        <button onClick={handleClick2} className="col-span-1 bg-black rounded-l-xl hover:bg-slate-950 text-xs sm:text-base text-slate-100 hover:text-white flex items-center justify-center px-1 sm:px-3 py-1 border-[2px] border-gray-400 hover:border-orange-600 duration-200 relative">Laad PlantenCollectie uit Collectie ID</button>
-        <input 
-          type="text" 
-          value={inputValue} 
-          onChange={(e) => setInputValue(e.target.value)} 
+      <div className="grid grid-cols-2 gap-0 px-3 py-2">
+        {/* Top left: Input field */}
+        <input
+          type="text"
+          value={inputValue}
+          onChange={(e) => setInputValue(e.target.value)}
           placeholder="Voer uw 64-karakter collectie ID in..."
-          className="flex flex-col col-span-1 text-center items-center justify-center text-xs sm:text-base px-1 sm:px-3 py-1 border-[2px] border-gray-400 hover:border-orange-600 duration-200 relative" 
+          className="text-center text-xs sm:text-base px-2 sm:px-3 py-3 border-[2px] border-gray-400 hover:border-orange-600 focus:border-orange-600 duration-200 rounded-tl-xl outline-none"
           name="inputtxh"
         />
-        <button className="w-full col-span-1 bg-black rounded-r-xl hover:bg-slate-950 text-slate-100 hover:text-white flex items-center justify-center gap-x-1 px-3 py-1 border-[2px] border-gray-400 hover:border-orange-600 duration-200 relative" onClick={() => handleAPI2(floras)}>Collectie updaten/toevoegen aan folder</button>
+
+        {/* Top right: Load collection button */}
+        <button
+          onClick={handleClick2}
+          className="bg-black rounded-tr-xl hover:bg-slate-950 text-xs sm:text-base text-slate-100 hover:text-white flex items-center justify-center px-2 sm:px-3 py-3 border-[2px] border-l-0 border-gray-400 hover:border-orange-600 duration-200"
+        >
+          Laad Collectie
+        </button>
+
+        {/* Bottom left: Load example collection button */}
+        <button
+          onClick={handleLoadExampleCollection}
+          className="bg-green-700 rounded-bl-xl hover:bg-green-800 text-xs sm:text-base text-slate-100 hover:text-white flex items-center justify-center px-2 sm:px-3 py-3 border-[2px] border-t-0 border-gray-400 hover:border-orange-600 duration-200"
+        >
+          Laad Voorbeeldcollectie
+        </button>
+
+        {/* Bottom right: Update/add to folder button */}
+        <button
+          onClick={handleSaveCollection}
+          disabled={isExampleCollection}
+          className={`rounded-br-xl text-xs sm:text-base flex items-center justify-center px-2 sm:px-3 py-3 border-[2px] border-t-0 border-l-0 border-gray-400 duration-200 ${
+            isExampleCollection
+              ? 'bg-gray-400 text-gray-600 cursor-not-allowed'
+              : 'bg-black hover:bg-slate-950 text-slate-100 hover:text-white hover:border-orange-600'
+          }`}
+          title={isExampleCollection ? 'Voorbeeldcollectie kan niet worden opgeslagen' : 'Sla collectie op in uw folder'}
+        >
+          Wijzig Collectie/Sla op
+        </button>
       </div>
 
       {/* Tab Navigation */}

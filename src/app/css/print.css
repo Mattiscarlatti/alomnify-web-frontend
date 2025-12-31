@@ -1,0 +1,58 @@
+@media print {
+  /* Hide non-printable elements */
+  .no-print {
+    display: none !important;
+  }
+
+  /* Page setup */
+  @page {
+    size: A4;
+    margin: 1.5cm;
+  }
+
+  /* Avoid page breaks inside charts */
+  .chart-container {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
+  /* Avoid breaks inside table rows */
+  table tr {
+    page-break-inside: avoid;
+  }
+
+  /* Force colors in print */
+  * {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* Chart sizing and rendering */
+  .recharts-wrapper {
+    width: 100% !important;
+    height: 300px !important;
+  }
+
+  .recharts-surface {
+    width: 100% !important;
+  }
+
+  /* Ensure SVGs print correctly */
+  svg {
+    overflow: visible !important;
+  }
+
+  /* Statistics grid - ensure it fits on one line */
+  .grid-cols-4 {
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  }
+
+  /* Reduce font sizes for better fit */
+  .text-sm {
+    font-size: 0.75rem !important;
+  }
+
+  .text-2xl {
+    font-size: 1.25rem !important;
+  }
+}

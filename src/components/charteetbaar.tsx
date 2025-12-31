@@ -20,6 +20,7 @@ export const ChartEetb = ({ plantendata5 }: BarChartProps) => {
       valueFormatter={valueFormatter}
       yAxisWidth={144}
       layout="vertical"
+      interval={0}
     />
   )
 }

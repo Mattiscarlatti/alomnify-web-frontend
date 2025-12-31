@@ -553,6 +553,7 @@ interface BarChartProps extends React.HTMLAttributes<HTMLDivElement> {
   legendPosition?: "left" | "center" | "right"
   tooltipCallback?: (tooltipCallbackContent: TooltipProps) => void
   customTooltip?: React.ComponentType<TooltipProps>
+  interval?: number | "preserveStart" | "preserveEnd" | "preserveStartEnd"
 }
 
 const BarChart = React.forwardRef<HTMLDivElement, BarChartProps>(
@@ -587,6 +588,7 @@ const BarChart = React.forwardRef<HTMLDivElement, BarChartProps>(
       legendPosition = "right",
       tooltipCallback,
       customTooltip,
+      interval,
       ...other
     } = props
     const CustomTooltip = customTooltip
@@ -762,7 +764,7 @@ const BarChart = React.forwardRef<HTMLDivElement, BarChartProps>(
                       ? [data[0][index], data[data.length - 1][index]]
                       : undefined,
                     type: "category",
-                    interval: "equidistantPreserveStart",
+                    interval: interval !== undefined ? interval : "equidistantPreserveStart",
                   })}
             >
               {yAxisLabel && (

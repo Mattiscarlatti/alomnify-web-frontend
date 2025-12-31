@@ -1,15 +1,18 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { addToCart } from "@/redux/shoppingSlice";
 import { useDispatch } from "react-redux";
+import { useReactToPrint } from 'react-to-print';
 import { ChartBedreigd } from "@/components/chartbedreigd";
 import { ChartEetb } from "@/components/charteetbaar";
 import { ChartBloei } from "@/components/chartbloei";
 import { ChartPlantTypen } from "@/components/chartplanttypen";
 import Banner2 from "@/components/banner2";
 import Container from "@/components/container";
+import PrintableCollectionReport from './PrintableCollectionReport';
 import { Flora, Flora2 } from "../../type";
+import '@/app/css/print.css';
 
 (BigInt.prototype as any).toJSON = function () {
   return this.toString();
@@ -32,7 +35,7 @@ function calculateFactorScore(records: Record<string, number>): number {
 
 const calculateRecordScore = (flora: Flora2): number => {
   let score = 1;
-  if (flora.latin_name.includes(" ca. 25")) {
+  if (flora.latin_name.includes("ca. 25 jaar")) {
     score *= 3;
   }
   if (
@@ -69,6 +72,7 @@ interface PlantCollectionPageProps {
 
 const PlantCollectionPage = ({ initialCollectionId }: PlantCollectionPageProps) => {
   const dispatch = useDispatch();
+  const printableRef = useRef<HTMLDivElement>(null);
   const [txH, setTxh] = useState("");
   const [inputValue, setInputValue] = useState<string>(initialCollectionId || '');
   const [planTen, setPlanten] = useState<number[]>([]);
@@ -95,6 +99,8 @@ const PlantCollectionPage = ({ initialCollectionId }: PlantCollectionPageProps) 
   const [loadingPhotos, setLoadingPhotos] = useState(false);
   const [plantsWithoutPhotos, setPlantsWithoutPhotos] = useState<Flora2[]>([]);
   const [isExampleCollection, setIsExampleCollection] = useState(false);
+  const [photosLoadedCount, setPhotosLoadedCount] = useState(0);
+  const PHOTOS_PER_BATCH = 25;
 
   const handleClick2 = () => {
     setTxh(inputValue);
@@ -116,6 +122,17 @@ const PlantCollectionPage = ({ initialCollectionId }: PlantCollectionPageProps) 
       return;
     }
     handleAPI2(floras);
+  };
+
+  const reactToPrintFn = useReactToPrint({
+    contentRef: printableRef,
+    documentTitle: `Plantencollectie_${txH}_${new Date().toISOString().split('T')[0]}`,
+  });
+
+  const handlePrintPDF = async () => {
+    // Give charts time to render
+    await new Promise((resolve) => setTimeout(resolve, 500));
+    reactToPrintFn();
   };
 
   useEffect(() => {
@@ -180,22 +197,33 @@ const PlantCollectionPage = ({ initialCollectionId }: PlantCollectionPageProps) 
         setTotalScore(totalsum);
         const aantalplanten = jsonObject.length;
         setAantal(aantalplanten);
-        const aantalboom = jsonObject.filter(obj => obj.plant_type === " boom");
-        const aantalfruitboom = jsonObject.filter(obj => obj.plant_type === " fruitboom");
-        const aantalconiferen = jsonObject.filter(obj => obj.plant_type === " coniferen");
+        const aantalboom = jsonObject.filter(obj => obj.plant_type === "boom");
+        const aantalfruitboom = jsonObject.filter(obj => obj.plant_type === "fruitboom");
+        const aantalconiferen = jsonObject.filter(obj => obj.plant_type === "coniferen");
         const aantalboo = aantalboom.length;
         const aantalfrui = aantalfruitboom.length;
         const aantalcon = aantalconiferen.length;
         const aantalBom = aantalboo + aantalfrui + aantalcon;
         setAantalBomen(aantalBom);
-        const aantalBom25 = jsonObject.filter(obj => obj.latin_name.includes(" ca. 25"));
+        // Debug: check for ouder dan ca. 25 jaar in latin names
+        const met25 = jsonObject.filter(obj => obj.latin_name.includes("ouder dan ca. 25 jaar"));
+        console.log('Planten met "ouder dan ca. 25 jaar":', met25.map(p => p.latin_name));
+        const aantalBom25 = jsonObject.filter(obj => obj.latin_name.includes("ouder dan ca. 25 jaar"));
         const aantalB25 = aantalBom25.length;
+        console.log('Aantal bomen 25+:', aantalB25);
         setAantalBomen25(aantalB25);
-        const aantalGroenBl = jsonObject.filter(obj => obj.groen_blijvend === " groenblijvend");
+        const aantalGroenBl = jsonObject.filter(obj => obj.groen_blijvend === "groenblijvend");
         const aantalGroenB = aantalGroenBl.length;
         setAantalGroen(aantalGroenB);
-        const aantalEetb = jsonObject.filter(obj => obj.eet_baar?.trim());
+        // Debug: check eet_baar values
+        const eetbaarValues = jsonObject.map(obj => ({ id: obj.id, eetbaar: obj.eet_baar, trimmed: obj.eet_baar?.trim() }));
+        console.log('Eetbaar sample (first 5):', eetbaarValues.slice(0, 5));
+        const aantalEetb = jsonObject.filter(obj => {
+          const trimmed = obj.eet_baar?.trim();
+          return trimmed && trimmed.toLowerCase() !== "niet eetbaar";
+        });
         const aantalEetba = aantalEetb.length;
+        console.log('Aantal eetbaar (method 1):', aantalEetba);
         setAantalEetbaar(aantalEetba);
         const plantTypeCounts = jsonObject.reduce<Record<string, number>>((acc, flor) => {
           acc[flor.plant_type] = (acc[flor.plant_type] || 0) + 1;
@@ -210,29 +238,33 @@ const PlantCollectionPage = ({ initialCollectionId }: PlantCollectionPageProps) 
         setAantalType(sortedPTCounts);
         const plantEndangeredCounts = jsonObject.reduce<Record<string, number>>((acc, flor) => {
           acc[flor.be_dreigd] = (acc[flor.be_dreigd] || 0) + 1;
-          return acc;        
+          return acc;
         }, {});
-        delete plantEndangeredCounts[" "];
-        delete plantEndangeredCounts[" lang geleden verwilderd"];
+        delete plantEndangeredCounts[""];
+        delete plantEndangeredCounts["lang geleden verwilderd"];
         const formattedEndangeredCounts = Object.entries(plantEndangeredCounts).map(([key, value]) => ({
           name: key,
           value: value
         }));
         setAantalBedreigd(formattedEndangeredCounts);
-        const aantalBedr = jsonObject.filter(obj => obj.be_dreigd === " bedreigd");
+        const aantalBedr = jsonObject.filter(obj => obj.be_dreigd === "bedreigd");
         const aantalBedrei = aantalBedr.length;
         setAantalBedreigd2(aantalBedrei);
-        const aantalEBedr = jsonObject.filter(obj => obj.be_dreigd === " ernstig bedreigd");
+        const aantalEBedr = jsonObject.filter(obj => obj.be_dreigd === "ernstig bedreigd");
         const aantalEBedrei = aantalEBedr.length;
         setAantalErnstigB(aantalEBedrei);
-        const aantalKwets = jsonObject.filter(obj => obj.be_dreigd === " kwetsbaar");
+        const aantalKwets = jsonObject.filter(obj => obj.be_dreigd === "kwetsbaar");
         const aantalKwetsb = aantalKwets.length;
         setAantalKwetsbaar(aantalKwetsb);
-        const aantalGev = jsonObject.filter(obj => obj.be_dreigd === " gevoelig");
+        const aantalGev = jsonObject.filter(obj => obj.be_dreigd === "gevoelig");
         const aantalGevoe = aantalGev.length;
         setAantalGevoelig(aantalGevoe);
-        const aantalInhee = jsonObject.filter(obj => obj.in_heems === " inheems");
+        // Debug: check what values exist for in_heems
+        const inHeemsValues = [...new Set(jsonObject.map(obj => obj.in_heems))];
+        console.log('Unique in_heems values:', inHeemsValues);
+        const aantalInhee = jsonObject.filter(obj => obj.in_heems === "inheems");
         const aantalInhe = aantalInhee.length;
+        console.log('Aantal inheems (method 1):', aantalInhe);
         setAantalInh(aantalInhe);
         const aantallen1 = jsonObject.filter(obj => obj.bloei_tijd.includes(" 1 "));
         const aantalle1 = aantallen1.length;
@@ -376,32 +408,54 @@ const PlantCollectionPage = ({ initialCollectionId }: PlantCollectionPageProps) 
     }
   };
 
-  // Load all plant photos when photos tab is activated
-  useEffect(() => {
-    if (activeTab === 'photos' && floras.length > 0 && Object.keys(plantPhotos).length === 0) {
-      setLoadingPhotos(true);
+  // Load photos in batches
+  const loadMorePhotos = async () => {
+    if (photosLoadedCount >= floras.length) return;
 
-      Promise.all(
-        floras.map(async (plant) => {
+    setLoadingPhotos(true);
+
+    const startIndex = photosLoadedCount;
+    const endIndex = Math.min(photosLoadedCount + PHOTOS_PER_BATCH, floras.length);
+    const batch = floras.slice(startIndex, endIndex);
+
+    try {
+      const results = await Promise.all(
+        batch.map(async (plant) => {
           const photoUrl = await fetchPlantPhoto(plant.latin_name, plant.id);
           return { id: plant.id, url: photoUrl, plant };
         })
-      ).then((results) => {
-        const photosMap: Record<number, string> = {};
-        const plantsWithoutPhotosArray: Flora2[] = [];
+      );
 
-        results.forEach(({ id, url, plant }) => {
-          if (url) {
-            photosMap[id] = url;
-          } else {
-            plantsWithoutPhotosArray.push(plant);
+      setPlantPhotos(prev => {
+        const newPhotos = { ...prev };
+        results.forEach(({ id, url }) => {
+          if (url) newPhotos[id] = url;
+        });
+        return newPhotos;
+      });
+
+      setPlantsWithoutPhotos(prev => {
+        const newList = [...prev];
+        results.forEach(({ url, plant }) => {
+          if (!url && !prev.find(p => p.id === plant.id)) {
+            newList.push(plant);
           }
         });
-
-        setPlantPhotos(photosMap);
-        setPlantsWithoutPhotos(plantsWithoutPhotosArray);
-        setLoadingPhotos(false);
+        return newList;
       });
+
+      setPhotosLoadedCount(endIndex);
+    } catch (error) {
+      console.error('Error loading photo batch:', error);
+    } finally {
+      setLoadingPhotos(false);
+    }
+  };
+
+  // Auto-load first batch when switching to photos tab
+  useEffect(() => {
+    if (activeTab === 'photos' && floras.length > 0 && photosLoadedCount === 0) {
+      loadMorePhotos();
     }
   }, [activeTab, floras]);
 
@@ -477,6 +531,16 @@ const PlantCollectionPage = ({ initialCollectionId }: PlantCollectionPageProps) 
           Wijzig Collectie/Sla op
         </button>
       </div>
+
+      {/* PDF Download button */}
+      { aantalEetbaar && (
+        <button
+          onClick={handlePrintPDF}
+          className="mt-4 w-full bg-black hover:bg-slate-950 text-slate-100 hover:text-white flex items-center justify-center px-3 py-3 rounded-lg transition-colors"
+        >
+          Download PDF Rapport
+        </button>
+      )}
 
       {/* Tab Navigation */}
       { aantalEetbaar && (
@@ -574,7 +638,9 @@ const PlantCollectionPage = ({ initialCollectionId }: PlantCollectionPageProps) 
           {loadingPhotos && (
             <div className="text-center mb-8">
               <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-orange-600"></div>
-              <p className="text-gray-600 mt-2">Foto's worden geladen via Flickr...</p>
+              <p className="text-gray-600 mt-2">
+                Foto's worden geladen via Flickr... ({photosLoadedCount}/{floras.length})
+              </p>
             </div>
           )}
 
@@ -605,6 +671,18 @@ const PlantCollectionPage = ({ initialCollectionId }: PlantCollectionPageProps) 
             )}
           </div>
 
+          {/* Load More Button */}
+          {photosLoadedCount < floras.length && !loadingPhotos && (
+            <div className="flex justify-center mt-6">
+              <button
+                onClick={loadMorePhotos}
+                className="bg-black hover:bg-slate-950 text-slate-100 hover:text-white font-medium py-3 px-6 rounded-lg transition-colors"
+              >
+                Laad Meer Foto's ({photosLoadedCount}/{floras.length} geladen)
+              </button>
+            </div>
+          )}
+
           <p className="text-center text-xs text-gray-500 mt-4">
             Foto's afkomstig van Flickr.
           </p>
@@ -634,6 +712,34 @@ const PlantCollectionPage = ({ initialCollectionId }: PlantCollectionPageProps) 
           )}
         </div>
       )}
+
+      {/* Hidden printable version */}
+      <div style={{ position: 'absolute', left: '-9999px', top: 0 }}>
+        <PrintableCollectionReport
+          ref={printableRef}
+          floras={floras}
+          statistics={{
+            totalScore: totalScore || 0,
+            aantal: aantal || 0,
+            aantalBomen: aantalBomen || 0,
+            aantalBomen25: aantalBomen25 || 0,
+            aantalGroen: aantalGroen || 0,
+            aantalEetbaar: aantalEetbaar || 0,
+            aantalBedreigd2: aantalBedreigd2 || 0,
+            aantalErnstigB: aantalErnstigB || 0,
+            aantalKwetsbaar: aantalKwetsbaar || 0,
+            aantalGevoelig: aantalGevoelig || 0,
+            aantalInh: aantalInh || 0,
+          }}
+          chartData={{
+            aantalType,
+            aantalBloei,
+            aantalBedreigd,
+            aantalEet,
+          }}
+          collectionId={txH}
+        />
+      </div>
     </div>
     </Container>
   );

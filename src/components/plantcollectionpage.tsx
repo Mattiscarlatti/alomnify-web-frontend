@@ -490,38 +490,30 @@ const PlantCollectionPage = ({ initialCollectionId }: PlantCollectionPageProps) 
         </div>
       )}
 
-      <div className="grid grid-cols-2 gap-0 px-3 py-2">
-        {/* Top left: Input field */}
+      <div className="flex flex-col gap-0 px-3 py-2">
+        {/* Input field */}
         <input
           type="text"
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
           placeholder="Voer uw 64-karakter collectie ID in..."
-          className="text-center text-xs sm:text-base px-2 sm:px-3 py-3 border-[2px] border-gray-400 hover:border-orange-600 focus:border-orange-600 duration-200 rounded-tl-xl outline-none"
+          className="text-center text-xs sm:text-base px-2 sm:px-3 py-3 border-[2px] border-gray-400 hover:border-orange-600 focus:border-orange-600 duration-200 rounded-t-xl outline-none"
           name="inputtxh"
         />
 
-        {/* Top right: Load collection button */}
+        {/* Load collection button */}
         <button
           onClick={handleClick2}
-          className="bg-black rounded-tr-xl hover:bg-slate-950 text-xs sm:text-base text-slate-100 hover:text-white flex items-center justify-center px-2 sm:px-3 py-3 border-[2px] border-l-0 border-gray-400 hover:border-orange-600 duration-200"
+          className="bg-black hover:bg-slate-950 text-xs sm:text-base text-slate-100 hover:text-white flex items-center justify-center px-2 sm:px-3 py-3 border-[2px] border-t-0 border-gray-400 hover:border-orange-600 duration-200"
         >
           Laad Collectie
         </button>
 
-        {/* Bottom left: Load example collection button */}
-        <button
-          onClick={handleLoadExampleCollection}
-          className="bg-green-700 rounded-bl-xl hover:bg-green-800 text-xs sm:text-base text-slate-100 hover:text-white flex items-center justify-center px-2 sm:px-3 py-3 border-[2px] border-t-0 border-gray-400 hover:border-orange-600 duration-200"
-        >
-          Laad Voorbeeldcollectie
-        </button>
-
-        {/* Bottom right: Update/add to folder button */}
+        {/* Update/add to folder button */}
         <button
           onClick={handleSaveCollection}
           disabled={isExampleCollection}
-          className={`rounded-br-xl text-xs sm:text-base flex items-center justify-center px-2 sm:px-3 py-3 border-[2px] border-t-0 border-l-0 border-gray-400 duration-200 ${
+          className={`text-xs sm:text-base flex items-center justify-center px-2 sm:px-3 py-3 border-[2px] border-t-0 border-gray-400 duration-200 ${
             isExampleCollection
               ? 'bg-gray-400 text-gray-600 cursor-not-allowed'
               : 'bg-black hover:bg-slate-950 text-slate-100 hover:text-white hover:border-orange-600'
@@ -529,6 +521,14 @@ const PlantCollectionPage = ({ initialCollectionId }: PlantCollectionPageProps) 
           title={isExampleCollection ? 'Voorbeeldcollectie kan niet worden opgeslagen' : 'Sla collectie op in uw folder'}
         >
           Wijzig Collectie/Sla op
+        </button>
+
+        {/* Load example collection button */}
+        <button
+          onClick={handleLoadExampleCollection}
+          className="bg-green-700 rounded-b-xl hover:bg-green-800 text-xs sm:text-base text-slate-100 hover:text-white flex items-center justify-center px-2 sm:px-3 py-3 border-[2px] border-t-0 border-gray-400 hover:border-orange-600 duration-200"
+        >
+          Laad Voorbeeldcollectie
         </button>
       </div>
 

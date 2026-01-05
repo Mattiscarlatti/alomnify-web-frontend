@@ -148,6 +148,167 @@ const PlantCollectionPage = ({ initialCollectionId }: PlantCollectionPageProps) 
     }
   }, [initialCollectionId]);
 
+  const calculateStatsFromPlants = (jsonObject: Flora2[], factors: Record<string, number>) => {
+    console.log('🎯 calculateStatsFromPlants called with:', {
+      plantsCount: jsonObject?.length || 0,
+      factors,
+      firstPlant: jsonObject?.[0]
+    });
+
+    const scoreListx = jsonObject.map((x) => (calculateRecordScore(x)));
+    const scoreListy = scoreListx.map((x) => (1+(x/10)))
+    const recordsum = sumList(scoreListy);
+    const factorsum = calculateFactorScore(factors);
+    const totalsum = Math.round(recordsum**factorsum);
+    setTotalScore(totalsum);
+    const aantalplanten = jsonObject.length;
+    setAantal(aantalplanten);
+    const aantalboom = jsonObject.filter(obj => obj.plant_type === "boom");
+    const aantalfruitboom = jsonObject.filter(obj => obj.plant_type === "fruitboom");
+    const aantalconiferen = jsonObject.filter(obj => obj.plant_type === "coniferen");
+    const aantalboo = aantalboom.length;
+    const aantalfrui = aantalfruitboom.length;
+    const aantalcon = aantalconiferen.length;
+    const aantalBom = aantalboo + aantalfrui + aantalcon;
+    setAantalBomen(aantalBom);
+    // Debug: check for ouder dan ca. 25 jaar in latin names
+    const met25 = jsonObject.filter(obj => obj.latin_name.includes("ouder dan ca. 25 jaar"));
+    console.log('Planten met "ouder dan ca. 25 jaar":', met25.map(p => p.latin_name));
+    const aantalBom25 = jsonObject.filter(obj => obj.latin_name.includes("ouder dan ca. 25 jaar"));
+    const aantalB25 = aantalBom25.length;
+    console.log('Aantal bomen 25+:', aantalB25);
+    setAantalBomen25(aantalB25);
+    const aantalGroenBl = jsonObject.filter(obj => obj.groen_blijvend === "groenblijvend");
+    const aantalGroenB = aantalGroenBl.length;
+    setAantalGroen(aantalGroenB);
+    // Debug: check eet_baar values
+    const eetbaarValues = jsonObject.map(obj => ({ id: obj.id, eetbaar: obj.eet_baar, trimmed: obj.eet_baar?.trim() }));
+    console.log('Eetbaar sample (first 5):', eetbaarValues.slice(0, 5));
+    const aantalEetb = jsonObject.filter(obj => {
+      const trimmed = obj.eet_baar?.trim();
+      return trimmed && trimmed.toLowerCase() !== "niet eetbaar";
+    });
+    const aantalEetba = aantalEetb.length;
+    console.log('Aantal eetbaar (method 1):', aantalEetba);
+    setAantalEetbaar(aantalEetba);
+    const plantTypeCounts = jsonObject.reduce<Record<string, number>>((acc, flor) => {
+      acc[flor.plant_type] = (acc[flor.plant_type] || 0) + 1;
+      return acc;
+    }, {});
+    const formattedPlantTypeCounts: { name: string; value: number }[] =
+      Object.entries(plantTypeCounts).map(([key, value]) => ({
+        name: key,
+        value: value as number,
+    }));
+    const sortedPTCounts = [...formattedPlantTypeCounts].sort((a, b) => b.value - a.value);
+    setAantalType(sortedPTCounts);
+    const plantEndangeredCounts = jsonObject.reduce<Record<string, number>>((acc, flor) => {
+      acc[flor.be_dreigd] = (acc[flor.be_dreigd] || 0) + 1;
+      return acc;
+    }, {});
+    delete plantEndangeredCounts[""];
+    delete plantEndangeredCounts["lang geleden verwilderd"];
+    const formattedEndangeredCounts = Object.entries(plantEndangeredCounts).map(([key, value]) => ({
+      name: key,
+      value: value
+    }));
+    setAantalBedreigd(formattedEndangeredCounts);
+    const aantalBedr = jsonObject.filter(obj => obj.be_dreigd === "bedreigd");
+    const aantalBedrei = aantalBedr.length;
+    setAantalBedreigd2(aantalBedrei);
+    const aantalEBedr = jsonObject.filter(obj => obj.be_dreigd === "ernstig bedreigd");
+    const aantalEBedrei = aantalEBedr.length;
+    setAantalErnstigB(aantalEBedrei);
+    const aantalKwets = jsonObject.filter(obj => obj.be_dreigd === "kwetsbaar");
+    const aantalKwetsb = aantalKwets.length;
+    setAantalKwetsbaar(aantalKwetsb);
+    const aantalGev = jsonObject.filter(obj => obj.be_dreigd === "gevoelig");
+    const aantalGevoe = aantalGev.length;
+    setAantalGevoelig(aantalGevoe);
+    // Debug: check what values exist for in_heems
+    const inHeemsValues = [...new Set(jsonObject.map(obj => obj.in_heems))];
+    console.log('Unique in_heems values:', inHeemsValues);
+    const aantalInhee = jsonObject.filter(obj => obj.in_heems === "inheems");
+    const aantalInhe = aantalInhee.length;
+    console.log('Aantal inheems (method 1):', aantalInhe);
+    setAantalInh(aantalInhe);
+    const aantallen1 = jsonObject.filter(obj => obj.bloei_tijd.includes(" 1 "));
+    const aantalle1 = aantallen1.length;
+    const aantallen2 = jsonObject.filter(obj => obj.bloei_tijd.includes(" 2"));
+    const aantalle2 = aantallen2.length;
+    const aantallen3 = jsonObject.filter(obj => obj.bloei_tijd.includes(" 3"));
+    const aantalle3 = aantallen3.length;
+    const aantallen4 = jsonObject.filter(obj => obj.bloei_tijd.includes(" 4"));
+    const aantalle4 = aantallen4.length;
+    const aantallen5 = jsonObject.filter(obj => obj.bloei_tijd.includes(" 5"));
+    const aantalle5 = aantallen5.length;
+    const aantallen6 = jsonObject.filter(obj => obj.bloei_tijd.includes(" 6"));
+    const aantalle6 = aantallen6.length;
+    const aantallen7 = jsonObject.filter(obj => obj.bloei_tijd.includes(" 7"));
+    const aantalle7 = aantallen7.length;
+    const aantallen8 = jsonObject.filter(obj => obj.bloei_tijd.includes(" 8"));
+    const aantalle8 = aantallen8.length;
+    const aantallen9 = jsonObject.filter(obj => obj.bloei_tijd.includes(" 9"));
+    const aantalle9 = aantallen9.length;
+    const aantallen10 = jsonObject.filter(obj => obj.bloei_tijd.includes(" 10"));
+    const aantalle10 = aantallen10.length;
+    const aantallen11 = jsonObject.filter(obj => obj.bloei_tijd.includes(" 11"));
+    const aantalle11 = aantallen11.length;
+    const aantallen12 = jsonObject.filter(obj => obj.bloei_tijd.includes(" 12"));
+    const aantalle12 = aantallen12.length;
+    const aantallenBloei = [
+      { name: "januari", value: aantalle1 },
+      { name: "februari", value: aantalle2 },
+      { name: "maart", value: aantalle3 },
+      { name: "april", value: aantalle4 },
+      { name: "mei", value: aantalle5 },
+      { name: "juni", value: aantalle6 },
+      { name: "juli", value: aantalle7 },
+      { name: "augustus", value: aantalle8 },
+      { name: "september", value: aantalle9 },
+      { name: "oktober", value: aantalle10 },
+      { name: "november", value: aantalle11 },
+      { name: "december", value: aantalle12 }
+    ];
+    setAantalBloei(aantallenBloei);
+    const aantallenBlad = jsonObject.filter(obj => obj.eet_baar.includes("bladeren"));
+    const aantalleBlad = aantallenBlad.length;
+    const aantallenBloem = jsonObject.filter(obj => obj.eet_baar.includes("bloemen"));
+    const aantalleBloem = aantallenBloem.length;
+    const aantallenZaad = jsonObject.filter(obj => obj.eet_baar.includes("zaden"));
+    const aantalleZaad = aantallenZaad.length;
+    const aantallenJongSch = jsonObject.filter(obj => obj.eet_baar.includes("jonge scheuten"));
+    const aantalleJongSch = aantallenJongSch.length;
+    const aantallenStamBin = jsonObject.filter(obj => obj.eet_baar.includes("stam"));
+    const aantalleStamBin = aantallenStamBin.length;
+    const aantallenSap = jsonObject.filter(obj => obj.eet_baar.includes("sap"));
+    const aantalleSap = aantallenSap.length;
+    const aantallenVrucht = jsonObject.filter(obj => obj.eet_baar.includes("vruchten"));
+    const aantalleVrucht = aantallenVrucht.length;
+    const aantallenOlie = jsonObject.filter(obj => obj.eet_baar.includes("olie"));
+    const aantalleOlie = aantallenOlie.length;
+    const aantallenWortel = jsonObject.filter(obj => obj.eet_baar.includes("wortels"));
+    const aantalleWortel = aantallenWortel.length;
+    const aantallenSteng = jsonObject.filter(obj => obj.eet_baar.includes("stengel"));
+    const aantalleSteng = aantallenSteng.length;
+    const aantallenBoon = jsonObject.filter(obj => obj.eet_baar.includes("boon"));
+    const aantalleBoon = aantallenBoon.length;
+    const aantallenEet = [
+      { name: "vruchten", value: aantalleVrucht },
+      { name: "zaden", value: aantalleZaad },
+      { name: "bonen", value: aantalleBoon },
+      { name: "bloemen", value: aantalleBloem },
+      { name: "bladeren", value: aantalleBlad },
+      { name: "wortels", value: aantalleWortel },
+      { name: "sap", value: aantalleSap },
+      { name: "olie", value: aantalleOlie },
+      { name: "jonge scheuten", value: aantalleJongSch },
+      { name: "stengels", value: aantalleSteng },
+      { name: "stam (binnenkant)", value: aantalleStamBin }
+    ];
+    setAantalEet(aantallenEet);
+  };
+
   const fetchMetadata = async (collectionId: string) => {
     setError(''); // Clear previous errors
     try {
@@ -171,198 +332,38 @@ const PlantCollectionPage = ({ initialCollectionId }: PlantCollectionPageProps) 
         const data = await response.json();
         const collection = data.collection;
 
+        console.log('🔍 Collection data received:', {
+          hasCollection: !!collection,
+          plantIdsCount: collection?.plantIds?.length || 0,
+          plantsCount: collection?.plants?.length || 0,
+          firstPlant: collection?.plants?.[0]
+        });
+
         if (!collection) {
           throw new Error('Geen collectiegegevens ontvangen.');
         }
 
+        if (!collection.plants || collection.plants.length === 0) {
+          throw new Error('Geen planten in collectie gevonden.');
+        }
+
+        // Backend now returns plants array directly, no need to fetch each plant separately
         setPlanten(collection.plantIds);
+        setFloras(collection.plants); // Use the plants data from the collection response
         setFactors(collection.environmentalFactors);
+
+        console.log('✅ Calling calculateStatsFromPlants with', collection.plants.length, 'plants');
+
+        // Calculate stats immediately with the plants data
+        calculateStatsFromPlants(collection.plants, collection.environmentalFactors);
       } catch (error: any) {
         console.error('Error fetching collection:', error);
         setError(error.message || 'Er is een onbekende fout opgetreden bij het laden van de collectie.');
     }
   };
   
-  useEffect(() => {
-    if (planTen && planTen.length > 0) {
-      Promise.all(planTen.map((x) => loadFlora(x)))
-      .then(resultaten => {
-        const jsonObject: Flora2[] = resultaten?.map((x) => (x?.[0]) ?? []).filter((item): item is Flora2 => !!item);
-        setFloras(jsonObject);
-        const scoreListx = jsonObject.map((x) => (calculateRecordScore(x)));
-        const scoreListy = scoreListx.map((x) => (1+(x/10)))
-        const recordsum = sumList(scoreListy);
-        const factorsum = calculateFactorScore(factors);
-        const totalsum = Math.round(recordsum**factorsum);
-        setTotalScore(totalsum);
-        const aantalplanten = jsonObject.length;
-        setAantal(aantalplanten);
-        const aantalboom = jsonObject.filter(obj => obj.plant_type === "boom");
-        const aantalfruitboom = jsonObject.filter(obj => obj.plant_type === "fruitboom");
-        const aantalconiferen = jsonObject.filter(obj => obj.plant_type === "coniferen");
-        const aantalboo = aantalboom.length;
-        const aantalfrui = aantalfruitboom.length;
-        const aantalcon = aantalconiferen.length;
-        const aantalBom = aantalboo + aantalfrui + aantalcon;
-        setAantalBomen(aantalBom);
-        // Debug: check for ouder dan ca. 25 jaar in latin names
-        const met25 = jsonObject.filter(obj => obj.latin_name.includes("ouder dan ca. 25 jaar"));
-        console.log('Planten met "ouder dan ca. 25 jaar":', met25.map(p => p.latin_name));
-        const aantalBom25 = jsonObject.filter(obj => obj.latin_name.includes("ouder dan ca. 25 jaar"));
-        const aantalB25 = aantalBom25.length;
-        console.log('Aantal bomen 25+:', aantalB25);
-        setAantalBomen25(aantalB25);
-        const aantalGroenBl = jsonObject.filter(obj => obj.groen_blijvend === "groenblijvend");
-        const aantalGroenB = aantalGroenBl.length;
-        setAantalGroen(aantalGroenB);
-        // Debug: check eet_baar values
-        const eetbaarValues = jsonObject.map(obj => ({ id: obj.id, eetbaar: obj.eet_baar, trimmed: obj.eet_baar?.trim() }));
-        console.log('Eetbaar sample (first 5):', eetbaarValues.slice(0, 5));
-        const aantalEetb = jsonObject.filter(obj => {
-          const trimmed = obj.eet_baar?.trim();
-          return trimmed && trimmed.toLowerCase() !== "niet eetbaar";
-        });
-        const aantalEetba = aantalEetb.length;
-        console.log('Aantal eetbaar (method 1):', aantalEetba);
-        setAantalEetbaar(aantalEetba);
-        const plantTypeCounts = jsonObject.reduce<Record<string, number>>((acc, flor) => {
-          acc[flor.plant_type] = (acc[flor.plant_type] || 0) + 1;
-          return acc;        
-        }, {});
-        const formattedPlantTypeCounts: { name: string; value: number }[] = 
-          Object.entries(plantTypeCounts).map(([key, value]) => ({
-            name: key,
-            value: value as number,
-        }));
-        const sortedPTCounts = [...formattedPlantTypeCounts].sort((a, b) => b.value - a.value);
-        setAantalType(sortedPTCounts);
-        const plantEndangeredCounts = jsonObject.reduce<Record<string, number>>((acc, flor) => {
-          acc[flor.be_dreigd] = (acc[flor.be_dreigd] || 0) + 1;
-          return acc;
-        }, {});
-        delete plantEndangeredCounts[""];
-        delete plantEndangeredCounts["lang geleden verwilderd"];
-        const formattedEndangeredCounts = Object.entries(plantEndangeredCounts).map(([key, value]) => ({
-          name: key,
-          value: value
-        }));
-        setAantalBedreigd(formattedEndangeredCounts);
-        const aantalBedr = jsonObject.filter(obj => obj.be_dreigd === "bedreigd");
-        const aantalBedrei = aantalBedr.length;
-        setAantalBedreigd2(aantalBedrei);
-        const aantalEBedr = jsonObject.filter(obj => obj.be_dreigd === "ernstig bedreigd");
-        const aantalEBedrei = aantalEBedr.length;
-        setAantalErnstigB(aantalEBedrei);
-        const aantalKwets = jsonObject.filter(obj => obj.be_dreigd === "kwetsbaar");
-        const aantalKwetsb = aantalKwets.length;
-        setAantalKwetsbaar(aantalKwetsb);
-        const aantalGev = jsonObject.filter(obj => obj.be_dreigd === "gevoelig");
-        const aantalGevoe = aantalGev.length;
-        setAantalGevoelig(aantalGevoe);
-        // Debug: check what values exist for in_heems
-        const inHeemsValues = [...new Set(jsonObject.map(obj => obj.in_heems))];
-        console.log('Unique in_heems values:', inHeemsValues);
-        const aantalInhee = jsonObject.filter(obj => obj.in_heems === "inheems");
-        const aantalInhe = aantalInhee.length;
-        console.log('Aantal inheems (method 1):', aantalInhe);
-        setAantalInh(aantalInhe);
-        const aantallen1 = jsonObject.filter(obj => obj.bloei_tijd.includes(" 1 "));
-        const aantalle1 = aantallen1.length;
-        const aantallen2 = jsonObject.filter(obj => obj.bloei_tijd.includes(" 2"));
-        const aantalle2 = aantallen2.length;
-        const aantallen3 = jsonObject.filter(obj => obj.bloei_tijd.includes(" 3"));
-        const aantalle3 = aantallen3.length;
-        const aantallen4 = jsonObject.filter(obj => obj.bloei_tijd.includes(" 4"));
-        const aantalle4 = aantallen4.length;
-        const aantallen5 = jsonObject.filter(obj => obj.bloei_tijd.includes(" 5"));
-        const aantalle5 = aantallen5.length;
-        const aantallen6 = jsonObject.filter(obj => obj.bloei_tijd.includes(" 6"));
-        const aantalle6 = aantallen6.length;
-        const aantallen7 = jsonObject.filter(obj => obj.bloei_tijd.includes(" 7"));
-        const aantalle7 = aantallen7.length;
-        const aantallen8 = jsonObject.filter(obj => obj.bloei_tijd.includes(" 8"));
-        const aantalle8 = aantallen8.length;
-        const aantallen9 = jsonObject.filter(obj => obj.bloei_tijd.includes(" 9"));
-        const aantalle9 = aantallen9.length;
-        const aantallen10 = jsonObject.filter(obj => obj.bloei_tijd.includes(" 10"));
-        const aantalle10 = aantallen10.length;
-        const aantallen11 = jsonObject.filter(obj => obj.bloei_tijd.includes(" 11"));
-        const aantalle11 = aantallen11.length;
-        const aantallen12 = jsonObject.filter(obj => obj.bloei_tijd.includes(" 12"));
-        const aantalle12 = aantallen12.length;
-        const aantallenBloei = [
-          { name: "januari", value: aantalle1 },
-          { name: "februari", value: aantalle2 },
-          { name: "maart", value: aantalle3 },
-          { name: "april", value: aantalle4 },
-          { name: "mei", value: aantalle5 },
-          { name: "juni", value: aantalle6 },
-          { name: "juli", value: aantalle7 },
-          { name: "augustus", value: aantalle8 },
-          { name: "september", value: aantalle9 },
-          { name: "oktober", value: aantalle10 },
-          { name: "november", value: aantalle11 },
-          { name: "december", value: aantalle12 }
-        ];
-        setAantalBloei(aantallenBloei);
-        const aantallenBlad = jsonObject.filter(obj => obj.eet_baar.includes("bladeren"));
-        const aantalleBlad = aantallenBlad.length;
-        const aantallenBloem = jsonObject.filter(obj => obj.eet_baar.includes("bloemen"));
-        const aantalleBloem = aantallenBloem.length;
-        const aantallenZaad = jsonObject.filter(obj => obj.eet_baar.includes("zaden"));
-        const aantalleZaad = aantallenZaad.length;
-        const aantallenJongSch = jsonObject.filter(obj => obj.eet_baar.includes("jonge scheuten"));
-        const aantalleJongSch = aantallenJongSch.length;
-        const aantallenStamBin = jsonObject.filter(obj => obj.eet_baar.includes("stam"));
-        const aantalleStamBin = aantallenStamBin.length;
-        const aantallenSap = jsonObject.filter(obj => obj.eet_baar.includes("sap"));
-        const aantalleSap = aantallenSap.length;
-        const aantallenVrucht = jsonObject.filter(obj => obj.eet_baar.includes("vruchten"));
-        const aantalleVrucht = aantallenVrucht.length;
-        const aantallenOlie = jsonObject.filter(obj => obj.eet_baar.includes("olie"));
-        const aantalleOlie = aantallenOlie.length;
-        const aantallenWortel = jsonObject.filter(obj => obj.eet_baar.includes("wortels"));
-        const aantalleWortel = aantallenWortel.length;
-        const aantallenSteng = jsonObject.filter(obj => obj.eet_baar.includes("stengel"));
-        const aantalleSteng = aantallenSteng.length;
-        const aantallenBoon = jsonObject.filter(obj => obj.eet_baar.includes("boon"));
-        const aantalleBoon = aantallenBoon.length;
-        const aantallenEet = [
-          { name: "vruchten", value: aantalleVrucht },
-          { name: "zaden", value: aantalleZaad },
-          { name: "bonen", value: aantalleBoon },
-          { name: "bloemen", value: aantalleBloem },
-          { name: "bladeren", value: aantalleBlad },
-          { name: "wortels", value: aantalleWortel },
-          { name: "sap", value: aantalleSap },
-          { name: "olie", value: aantalleOlie },
-          { name: "jonge scheuten", value: aantalleJongSch },
-          { name: "stengels", value: aantalleSteng },
-          { name: "stam (binnenkant)", value: aantalleStamBin }
-        ];
-        setAantalEet(aantallenEet);
-      })
-      .catch(error => console.error("Error loading flora:", error));
-    };
-  }, [planTen]);
-
-  const loadFlora = async (planT: number) => {
-    try {
-      const response = await fetch(`https://alomnify-api-production.alomnify.workers.dev/api/plants/${planT}`, {
-        method: 'GET',
-      });
-
-      if (!response.ok) {
-        throw new Error(`Error: ${response.status}`);
-      }
-
-      const data = await response.json();
-      return [data.plant]; // Return array format to match existing code structure
-    } catch (err: any) {
-      console.error('Error loading flora:', err.message);
-    }
-  };
-
+  // Note: The old useEffect that fetched plants individually has been removed
+  // The backend now returns all plant data in the collection response
 
   const convertToFlora = (data: any): Flora => ({
     id: data.id,
@@ -379,7 +380,7 @@ const PlantCollectionPage = ({ initialCollectionId }: PlantCollectionPageProps) 
   });
 
   // Fetch plant photo from Flickr API
-  const fetchPlantPhoto = async (plantName: string, plantId: number) => {
+  const fetchPlantPhoto = async (plantName: string) => {
     const apiKey = process.env.NEXT_PUBLIC_FLICKR_KEY;
 
     if (!apiKey) {
@@ -421,7 +422,7 @@ const PlantCollectionPage = ({ initialCollectionId }: PlantCollectionPageProps) 
     try {
       const results = await Promise.all(
         batch.map(async (plant) => {
-          const photoUrl = await fetchPlantPhoto(plant.latin_name, plant.id);
+          const photoUrl = await fetchPlantPhoto(plant.latin_name);
           return { id: plant.id, url: photoUrl, plant };
         })
       );
@@ -533,7 +534,7 @@ const PlantCollectionPage = ({ initialCollectionId }: PlantCollectionPageProps) 
       </div>
 
       {/* PDF Download button */}
-      { aantalEetbaar && (
+      { aantal !== undefined && (
         <button
           onClick={handlePrintPDF}
           className="mt-4 w-full bg-black hover:bg-slate-950 text-slate-100 hover:text-white flex items-center justify-center px-3 py-3 rounded-lg transition-colors"
@@ -543,7 +544,7 @@ const PlantCollectionPage = ({ initialCollectionId }: PlantCollectionPageProps) 
       )}
 
       {/* Tab Navigation */}
-      { aantalEetbaar && (
+      { aantal !== undefined && (
         <div className="flex border-b border-gray-300 mb-6">
           <button
             onClick={() => setActiveTab('statistics')}
@@ -569,9 +570,9 @@ const PlantCollectionPage = ({ initialCollectionId }: PlantCollectionPageProps) 
       )}
 
       {/* Statistics Tab Content */}
-      { aantalEetbaar && activeTab === 'statistics' &&
-        <div className="relative w-full h-[200px] flex items-center bg-gray-200"> 
-        <Banner2 
+      { aantal !== undefined && activeTab === 'statistics' &&
+        <div className="relative w-full h-[200px] flex items-center bg-gray-200">
+        <Banner2
             plantendata0={{
               aantalPlantenSoorten: aantal as number,
               aantalInheemseSoorten: aantalInh as number,
@@ -587,7 +588,7 @@ const PlantCollectionPage = ({ initialCollectionId }: PlantCollectionPageProps) 
             }}
       /></div>
       }
-      { aantalEetbaar && activeTab === 'statistics' &&
+      { aantal !== undefined && activeTab === 'statistics' &&
         <div className="grid grid-cols-2">
           <div className="flex flex-col items-center justify-center gap-2 pb-28"><p className="">Bloeiende Planten</p><ChartBloei plantendata4={aantalBloei as any[]} /></div>
           <div className="flex flex-col items-center justify-center gap-2 pb-28"><p className="">Kwetsbaarheid van Inheemsen</p><ChartBedreigd plantendata3={aantalBedreigd as any[]} /></div>
@@ -595,7 +596,7 @@ const PlantCollectionPage = ({ initialCollectionId }: PlantCollectionPageProps) 
           <div className="flex flex-col items-center justify-center gap-2 pb-14"><p className="">Type Planten</p><ChartPlantTypen plantendata1={aantalType as any[]} /></div>
         </div>
       }
-      { aantalEetbaar && activeTab === 'statistics' &&
+      { aantal !== undefined && activeTab === 'statistics' &&
         <div>
           <table className="table-auto border-collapse border border-gray-400 w-full text-left">
             <thead>
@@ -631,7 +632,7 @@ const PlantCollectionPage = ({ initialCollectionId }: PlantCollectionPageProps) 
       }
 
       {/* Photos Tab Content */}
-      { aantalEetbaar && activeTab === 'photos' && (
+      { aantal !== undefined && activeTab === 'photos' && (
         <div className="w-full">
           <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">Fotoimpressie van uw Plantencollectie</h2>
 

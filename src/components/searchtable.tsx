@@ -255,6 +255,7 @@ const SearchTable = () => {
                     setSelectedThreatLevels([]);
                     setFilterEvergreen(false);
                     setFilterNative(false);
+                    setResults([]); // Clear search results when clearing filters
                   }}
                   className="ml-4 text-orange-600 hover:text-orange-700 underline"
                 >

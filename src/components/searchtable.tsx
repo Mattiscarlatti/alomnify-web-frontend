@@ -22,6 +22,40 @@ const SearchTable = () => {
   const [filterEvergreen, setFilterEvergreen] = useState(false);
   const [filterNative, setFilterNative] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
+  // Sort plants function: Dutch first, then English, then Latin only; short names before subspecies
+  const sortPlants = (plants: Flora[]): Flora[] => {
+    return [...plants].sort((a, b) => {
+      // 1. Plants with Dutch name come first
+      const aHasDutch = !!a.dutch_name;
+      const bHasDutch = !!b.dutch_name;
+
+      if (aHasDutch && !bHasDutch) return -1;
+      if (!aHasDutch && bHasDutch) return 1;
+
+      // 2. If neither has Dutch, prefer English name
+      if (!aHasDutch && !bHasDutch) {
+        const aHasEnglish = !!a.english_name;
+        const bHasEnglish = !!b.english_name;
+
+        if (aHasEnglish && !bHasEnglish) return -1;
+        if (!aHasEnglish && bHasEnglish) return 1;
+      }
+
+      // 3. Within same category, prefer shorter Latin names (no subspecies)
+      // Subspecies typically have 3+ words in latin_name (e.g., "Genus species subspecies")
+      const aWords = a.latin_name.split(' ').length;
+      const bWords = b.latin_name.split(' ').length;
+      const aHasSubspecies = aWords > 2;
+      const bHasSubspecies = bWords > 2;
+
+      if (!aHasSubspecies && bHasSubspecies) return -1;
+      if (aHasSubspecies && !bHasSubspecies) return 1;
+
+      // 4. Finally, alphabetically by Latin name
+      return a.latin_name.localeCompare(b.latin_name, 'nl');
+    });
+  };
+
   const handleTextSearch = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setError('');
@@ -73,7 +107,9 @@ const SearchTable = () => {
       }
 
       const data = await response.json();
-      setResults(data.plants);
+      // Sort results before setting state
+      const sortedPlants = sortPlants(data.plants);
+      setResults(sortedPlants);
     } catch (err: any) {
       setError(err.message);
     }
@@ -320,8 +356,9 @@ const SearchTable = () => {
       <thead>
         <tr>
           <th className="border border-gray-300 px-2 py-2">Nr</th>
-          <th className="border border-gray-300 px-2 py-2"><label><input type="radio" value="latinnam" checked={selectedOption === "latinnam"} onChange={handleChange}/> Latijnse naam</label></th>
           <th className="border border-gray-300 px-2 py-2"><label><input type="radio" value="dutchnam" checked={selectedOption === "dutchnam"} onChange={handleChange}/> Nederlandse naam</label></th>
+          <th className="border border-gray-300 px-2 py-2">Engelse naam</th>
+          <th className="border border-gray-300 px-2 py-2"><label><input type="radio" value="latinnam" checked={selectedOption === "latinnam"} onChange={handleChange}/> Latijnse naam</label></th>
           <th className="border border-gray-300 px-2 py-2">Type plant</th>
           <th className="border border-gray-300 px-2 py-2">Bedreigd</th>
           <th className="border border-gray-300 px-2 py-2">Inheems</th>
@@ -335,8 +372,9 @@ const SearchTable = () => {
         {results.map((florum, index) => (
           <tr key={`${florum.id}-${index}`}>
             <td className="border border-gray-300 px-2 py-2">{florum.id}</td>
-            <td className="border border-gray-300 px-2 py-2">{florum.latin_name}</td>
-            <td className="border border-gray-300 px-2 py-2">{florum?.dutch_name}</td>
+            <td className="border border-gray-300 px-2 py-2 font-semibold">{florum?.dutch_name}</td>
+            <td className="border border-gray-300 px-2 py-2 text-gray-600 text-sm">{florum?.english_name}</td>
+            <td className="border border-gray-300 px-2 py-2 italic text-gray-600 text-sm">{florum.latin_name}</td>
             <td className="border border-gray-300 px-2 py-2">{florum?.plant_type}</td>
             <td className="border border-gray-300 px-2 py-2">{florum?.be_dreigd}</td>
             <td className="border border-gray-300 px-2 py-2">{florum?.in_heems}</td>
@@ -346,7 +384,7 @@ const SearchTable = () => {
             <td className="border border-gray-300 px-2 py-2">
             <button onClick={() => {
               dispatch(addToCart(florum))
-            }} 
+            }}
               className="btn btn-outline rounded-full bg-darkText text-slate-100 px-1 py-1 text-sm flex items-center border-[2px] border-gray-400 hover:border-orange-600 duration-200 relative">
               toevoegen
             </button>

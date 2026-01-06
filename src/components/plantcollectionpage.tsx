@@ -8,7 +8,6 @@ import { ChartBedreigd } from "@/components/chartbedreigd";
 import { ChartEetb } from "@/components/charteetbaar";
 import { ChartBloei } from "@/components/chartbloei";
 import { ChartPlantTypen } from "@/components/chartplanttypen";
-import Banner2 from "@/components/banner2";
 import Container from "@/components/container";
 import PrintableCollectionReport from './PrintableCollectionReport';
 import { Flora, Flora2 } from "../../type";
@@ -114,6 +113,70 @@ const PlantCollectionPage = ({ initialCollectionId }: PlantCollectionPageProps) 
     setTxh(exampleId);
     setIsExampleCollection(true); // Mark as example collection
     fetchMetadata(exampleId);
+  };
+
+  const handleShareCollection = async () => {
+    if (isExampleCollection) {
+      alert('De voorbeeldcollectie kan niet worden gedeeld.');
+      return;
+    }
+
+    const shareUrl = `${window.location.origin}/plantcollection?id=${txH}`;
+    const shareData = {
+      title: 'Alomnify Plantencollectie',
+      text: `Bekijk mijn plantencollectie met ${aantal} planten op Alomnify!`,
+      url: shareUrl,
+    };
+
+    // Try Web Share API first (mobile/modern browsers)
+    if (navigator.share) {
+      try {
+        await navigator.share(shareData);
+        return;
+      } catch (err: any) {
+        // User cancelled or error occurred
+        if (err.name !== 'AbortError') {
+          console.error('Error sharing:', err);
+        }
+      }
+    }
+
+    // Fallback: try to copy to clipboard
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      try {
+        await navigator.clipboard.writeText(shareUrl);
+        alert('Collectie link gekopieerd naar klembord! Je kunt deze nu delen.');
+        return;
+      } catch (err) {
+        console.error('Failed to copy to clipboard:', err);
+      }
+    }
+
+    // Final fallback: create a temporary input element
+    try {
+      const textArea = document.createElement('textarea');
+      textArea.value = shareUrl;
+      textArea.style.position = 'fixed';
+      textArea.style.left = '-999999px';
+      textArea.style.top = '-999999px';
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+
+      const successful = document.execCommand('copy');
+      document.body.removeChild(textArea);
+
+      if (successful) {
+        alert('Collectie link gekopieerd naar klembord! Je kunt deze nu delen.');
+      } else {
+        // Show the URL in an alert as last resort
+        alert('Kopieer deze link om de collectie te delen:\n\n' + shareUrl);
+      }
+    } catch (err) {
+      console.error('All copy methods failed:', err);
+      // Show the URL in an alert as last resort
+      alert('Kopieer deze link om de collectie te delen:\n\n' + shareUrl);
+    }
   };
 
   const handleSaveCollection = () => {
@@ -527,20 +590,40 @@ const PlantCollectionPage = ({ initialCollectionId }: PlantCollectionPageProps) 
         {/* Load example collection button */}
         <button
           onClick={handleLoadExampleCollection}
-          className="bg-green-700 rounded-b-xl hover:bg-green-800 text-xs sm:text-base text-slate-100 hover:text-white flex items-center justify-center px-2 sm:px-3 py-3 border-[2px] border-t-0 border-gray-400 hover:border-orange-600 duration-200"
+          className="bg-black rounded-b-xl hover:bg-slate-950 text-xs sm:text-base text-slate-100 hover:text-white flex items-center justify-center px-2 sm:px-3 py-3 border-[2px] border-t-0 border-gray-400 hover:border-orange-600 duration-200"
         >
           Laad Voorbeeldcollectie
         </button>
       </div>
 
-      {/* PDF Download button */}
+      {/* Action buttons: PDF Download and Share */}
       { aantal !== undefined && (
-        <button
-          onClick={handlePrintPDF}
-          className="mt-4 w-full bg-black hover:bg-slate-950 text-slate-100 hover:text-white flex items-center justify-center px-3 py-3 rounded-lg transition-colors"
-        >
-          Download PDF Rapport
-        </button>
+        <div className="mt-4 flex flex-col sm:flex-row gap-3">
+          <button
+            onClick={handlePrintPDF}
+            className="flex-1 bg-black hover:bg-slate-950 text-slate-100 hover:text-white flex items-center justify-center gap-2 px-3 py-3 rounded-lg transition-colors"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            Download PDF Rapport
+          </button>
+          <button
+            onClick={handleShareCollection}
+            disabled={isExampleCollection}
+            className={`flex-1 flex items-center justify-center gap-2 px-3 py-3 rounded-lg transition-colors ${
+              isExampleCollection
+                ? 'bg-gray-400 text-gray-600 cursor-not-allowed'
+                : 'bg-black hover:bg-slate-950 text-slate-100 hover:text-white'
+            }`}
+            title={isExampleCollection ? 'Voorbeeldcollectie kan niet worden gedeeld' : 'Deel deze collectie'}
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+            </svg>
+            Deel Collectie
+          </button>
+        </div>
       )}
 
       {/* Tab Navigation */}
@@ -571,22 +654,42 @@ const PlantCollectionPage = ({ initialCollectionId }: PlantCollectionPageProps) 
 
       {/* Statistics Tab Content */}
       { aantal !== undefined && activeTab === 'statistics' &&
-        <div className="relative w-full h-[200px] flex items-center bg-gray-200">
-        <Banner2
-            plantendata0={{
-              aantalPlantenSoorten: aantal as number,
-              aantalInheemseSoorten: aantalInh as number,
-              aantalBoomSoorten: aantalBomen as number,
-              aantalBoomSoorten25: aantalBomen25 as number,
-              aantalEetbareSoorten: aantalEetbaar as number,
-              aantalGroenblijvendeSoorten: aantalGroen as number,
-              aantalGevoeligeSoorten: aantalGevoelig as number,
-              aantalKwetsbareSoorten: aantalKwetsbaar as number,
-              aantalBedreigdeSoorten: aantalBedreigd2 as number,
-              aantalErnstigBedreigdeSoorten: aantalErnstigB as number,
-              biodiversiteitsScore: totalScore as number
-            }}
-      /></div>
+        <div className="w-full mb-6 px-6">
+          {/* Biodiversity Score Card */}
+          <div className="bg-green-50 border-2 border-green-700 rounded-2xl p-8 mb-6 shadow-lg text-center">
+            <h2 className="text-xl font-bold text-green-800 mb-3">🌿 Biodiversiteitsscore</h2>
+            <div className="text-6xl font-bold text-green-700 mb-2">{totalScore}</div>
+          </div>
+
+          {/* Stat Cards Grid */}
+          <div className="grid grid-cols-2 gap-3 mb-8">
+            <div className="bg-white border-2 border-gray-200 rounded-xl p-4 text-center">
+              <div className="text-3xl font-bold text-green-700">{aantal}</div>
+              <div className="text-xs text-gray-600 mt-1">Totaal Planten</div>
+            </div>
+            <div className="bg-white border-2 border-gray-200 rounded-xl p-4 text-center">
+              <div className="text-3xl font-bold text-green-700">{aantalEetbaar}</div>
+              <div className="text-xs text-gray-600 mt-1">Eetbaar</div>
+            </div>
+            <div className="bg-white border-2 border-gray-200 rounded-xl p-4 text-center">
+              <div className="text-3xl font-bold text-green-700">{aantalInh}</div>
+              <div className="text-xs text-gray-600 mt-1">Inheems</div>
+            </div>
+            <div className="bg-white border-2 border-gray-200 rounded-xl p-4 text-center">
+              <div className="text-3xl font-bold text-green-700">{(aantalBedreigd2 || 0) + (aantalErnstigB || 0)}</div>
+              <div className="text-xs text-gray-600 mt-1">(Ernstig) Bedreigd</div>
+            </div>
+            <div className="bg-white border-2 border-gray-200 rounded-xl p-4 text-center">
+              <div className="text-3xl font-bold text-green-700">{aantalBomen25}</div>
+              <div className="text-xs text-gray-600 mt-1">Bomen 25+ jaar</div>
+            </div>
+            <div className="bg-white border-2 border-gray-200 rounded-xl p-4 text-center">
+              <div className="text-3xl font-bold text-green-700">{aantalGroen}</div>
+              <div className="text-xs text-gray-600 mt-1">Groenblijvend</div>
+            </div>
+          </div>
+
+        </div>
       }
       { aantal !== undefined && activeTab === 'statistics' &&
         <div className="grid grid-cols-2">
@@ -597,37 +700,33 @@ const PlantCollectionPage = ({ initialCollectionId }: PlantCollectionPageProps) 
         </div>
       }
       { aantal !== undefined && activeTab === 'statistics' &&
-        <div>
-          <table className="table-auto border-collapse border border-gray-400 w-full text-left">
-            <thead>
-              <tr>
-                <th className="border border-gray-300 px-2 py-2">Nr</th>
-                <th className="border border-gray-300 px-2 py-2">Latijnse naam</th>
-                <th className="border border-gray-300 px-2 py-2">Nederlandse naam</th>
-                <th className="border border-gray-300 px-2 py-2">Type plant</th>
-                <th className="border border-gray-300 px-2 py-2">Bedreigd</th>
-                <th className="border border-gray-300 px-2 py-2">Inheems</th>
-                <th className="border border-gray-300 px-2 py-2">Eetbaar</th>
-                <th className="border border-gray-300 px-2 py-2">Bloeimaanden</th>
-                <th className="border border-gray-300 px-2 py-2">Groenblijvend</th>
-              </tr>
-            </thead>
-            <tbody>
-              {floras.map((flor) => (
-                <tr key={flor.id}>
-                  <td className="border border-gray-300 px-2 py-2">{flor.id}</td>
-                  <td className="border border-gray-300 px-2 py-2">{flor.latin_name}</td>
-                  <td className="border border-gray-300 px-2 py-2">{flor?.dutch_name}</td>
-                  <td className="border border-gray-300 px-2 py-2">{flor?.plant_type}</td>
-                  <td className="border border-gray-300 px-2 py-2">{flor?.be_dreigd}</td>
-                  <td className="border border-gray-300 px-2 py-2">{flor?.in_heems}</td>
-                  <td className="border border-gray-300 px-2 py-2">{flor?.eet_baar}</td>
-                  <td className="border border-gray-300 px-2 py-2">{flor?.bloei_tijd}</td>
-                  <td className="border border-gray-300 px-2 py-2">{flor?.groen_blijvend}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div className="w-full mb-6 px-6">
+          {/* Plant Cards List */}
+          <h2 className="text-xl font-semibold text-gray-800 mb-4">Planten in deze Collectie</h2>
+          <div className="space-y-3 mb-8">
+            {floras.map((plant) => (
+              <div key={plant.id} className="bg-white rounded-xl p-4 border-2 border-gray-200">
+                <div className="flex justify-between items-start mb-1">
+                  <h3 className="text-base font-bold text-green-700 flex-1">{plant.dutch_name || 'Geen Nederlandse naam'}</h3>
+                  <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">#{plant.id}</span>
+                </div>
+                {plant.english_name && (
+                  <p className="text-sm text-gray-600 mb-1">{plant.english_name}</p>
+                )}
+                <p className="text-sm italic text-gray-600 mb-2">{plant.latin_name}</p>
+                <div className="space-y-1">
+                  <p className="text-xs text-gray-700">🌿 {plant.plant_type}</p>
+                  <p className="text-xs text-gray-700">🌸 {plant.bloem_kleur}</p>
+                  {plant.be_dreigd && plant.be_dreigd !== 'Niet bedreigd' && (
+                    <p className="text-xs text-red-600 font-semibold">⚠️ {plant.be_dreigd}</p>
+                  )}
+                  {plant.eet_baar && plant.eet_baar !== 'Niet eetbaar' && (
+                    <p className="text-xs text-green-600 font-semibold">🍽️ {plant.eet_baar}</p>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       }
 

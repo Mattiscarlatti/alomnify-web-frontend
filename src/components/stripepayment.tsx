@@ -83,7 +83,7 @@ const CollectionSubmission = () => {
           className="btn btn-outline rounded-full bg-darkText text-slate-100 px-2 py-2 text-sm flex items-center border-[2px] border-gray-400 hover:border-orange-600 duration-200 relative"
           onClick={() => dialogRef.current?.showModal()}
         >
-          Sla deze Plantencollectie op (gratis)
+          Sla deze Plantencollectie op
         </button>
 
         <dialog ref={dialogRef} className="modal bg-white p-6 rounded border-[2px] border-black max-w-md">

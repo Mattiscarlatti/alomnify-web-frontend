@@ -19,8 +19,9 @@ const CartItem = () => {
       <thead>
         <tr>
           <th className="border border-gray-300 px-2 py-2">Nr</th>
-          <th className="border border-gray-300 px-2 py-2">Latijnse naam</th>
           <th className="border border-gray-300 px-2 py-2">Nederlandse naam</th>
+          <th className="border border-gray-300 px-2 py-2">Engelse naam</th>
+          <th className="border border-gray-300 px-2 py-2">Latijnse naam</th>
           <th className="border border-gray-300 px-2 py-2">Type plant</th>
           <th className="border border-gray-300 px-2 py-2">Bedreigd</th>
           <th className="border border-gray-300 px-2 py-2">Inheems</th>
@@ -35,8 +36,9 @@ const CartItem = () => {
         {floraData?.map((plantje: Flora) => (
           <tr key={plantje.latin_name}>
             <td className="border border-gray-300 px-2 py-2">{plantje.id}</td>
-            <td className="border border-gray-300 px-2 py-2">{plantje.latin_name}</td>
-            <td className="border border-gray-300 px-2 py-2">{plantje?.dutch_name}</td>
+            <td className="border border-gray-300 px-2 py-2 font-semibold">{plantje?.dutch_name}</td>
+            <td className="border border-gray-300 px-2 py-2 text-gray-600 text-sm">{plantje?.english_name}</td>
+            <td className="border border-gray-300 px-2 py-2 italic text-gray-600 text-sm">{plantje.latin_name}</td>
             <td className="border border-gray-300 px-2 py-2">{plantje?.plant_type}</td>
             <td className="border border-gray-300 px-2 py-2">{plantje?.be_dreigd}</td>
             <td className="border border-gray-300 px-2 py-2">{plantje?.in_heems}</td>

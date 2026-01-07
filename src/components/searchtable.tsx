@@ -305,6 +305,7 @@ const SearchTable = () => {
 
       {/* Text Search */}
       <div>
+        {/* Desktop search - hidden on mobile */}
         <form onSubmit={handleTextSearch} className="w-full bg-white hidden md:flex items-center gap-x-1 border-[1px] border-lightText/50 rounded-full px-5 py-0 focus-within:border-orange-600 group">
           <div className="flex grow">
             <input
@@ -320,6 +321,55 @@ const SearchTable = () => {
           </div>
           <div className="">
             <button type="submit" className="bg-black hover:bg-slate-950 rounded-full text-xs text-slate-100 hover:text-white flex items-center justify-center gap-x-1 px-3 py-1.5 border-[2px] border-gray-400 hover:border-orange-600 duration-200 relative">Zoeken</button>
+          </div>
+        </form>
+
+        {/* Mobile search - hidden on desktop */}
+        <form onSubmit={handleTextSearch} className="md:hidden bg-white rounded-lg border-[2px] border-gray-300 focus-within:border-orange-600 overflow-hidden">
+          {/* Search type selector */}
+          <div className="px-4 pt-3 pb-2 border-b border-gray-200">
+            <p className="text-xs text-gray-600 mb-2">Zoek op:</p>
+            <div className="flex gap-4">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="radio"
+                  value="dutchnam"
+                  checked={selectedOption === "dutchnam"}
+                  onChange={handleChange}
+                  className="text-orange-600 focus:ring-orange-500"
+                />
+                <span className="text-sm">Nederlandse naam</span>
+              </label>
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="radio"
+                  value="latinnam"
+                  checked={selectedOption === "latinnam"}
+                  onChange={handleChange}
+                  className="text-orange-600 focus:ring-orange-500"
+                />
+                <span className="text-sm">Latijnse naam</span>
+              </label>
+            </div>
+          </div>
+
+          {/* Search input */}
+          <div className="flex items-center gap-2 px-4 py-3">
+            <FiSearch className="text-gray-500 flex-shrink-0" />
+            <input
+              type="text"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Zoek een plant..."
+              className="flex-1 border-0 outline-none text-sm"
+            />
+          </div>
+
+          {/* Search button */}
+          <div className="px-4 pb-3">
+            <button type="submit" className="w-full bg-black hover:bg-slate-950 text-slate-100 hover:text-white py-2.5 rounded-lg border-[2px] border-gray-400 hover:border-orange-600 duration-200 text-sm font-medium">
+              Zoeken
+            </button>
           </div>
         </form>
       </div>

@@ -531,8 +531,10 @@ const PlantCollectionPage = ({ initialCollectionId }: PlantCollectionPageProps) 
     <Container>
     <div className="grid grid-cols-1 gap-6 bg-white/30 p-3 sm:p-6 md:p-12 shadow-xl ring-1 ring-gray-900/5 rounded-lg backdrop-blur-lg mx-auto w-full">
       { txH &&
-        <div className="grid grid-cols-4 px-3 py-2">
-          <p className="flex flex-col col-span-4 rounded-l-xl items-center justify-center gap-x-1 px-3 py-1">De resultaten worden getoond van PlantenCollectie ID: {txH}</p>
+        <div className="px-2 sm:px-3 py-2">
+          <p className="text-center text-xs sm:text-sm md:text-base break-words overflow-wrap-anywhere">
+            De resultaten worden getoond van PlantenCollectie ID: <span className="font-mono text-xs sm:text-sm">{txH}</span>
+          </p>
         </div>
       }
 

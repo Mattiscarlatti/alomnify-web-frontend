@@ -74,10 +74,10 @@ export default function SubmissionSuccess() {
         </button>
 
         <button
-          onClick={() => window.location.href = "/plantcollection"}
+          onClick={() => window.location.href = `/plantcollection?id=${collectionId}`}
           className="w-full btn btn-outline rounded-full bg-blue-600 text-white px-4 py-2"
         >
-          Bekijk PlantenCollectie Pagina
+          Ga naar Collectie Pagina
         </button>
 
         <div className="mt-6 pt-4 border-t text-sm text-gray-500">

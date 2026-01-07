@@ -352,7 +352,8 @@ const SearchTable = () => {
       )}
 
       <br />
-      <table className="table-auto border-collapse border border-gray-400 w-full text-left">
+      {/* Desktop table view - hidden on mobile */}
+      <table className="hidden md:table table-auto border-collapse border border-gray-400 w-full text-left">
       <thead>
         <tr>
           <th className="border border-gray-300 px-2 py-2">Nr</th>
@@ -393,6 +394,50 @@ const SearchTable = () => {
         ))}
       </tbody>
     </table>
+
+      {/* Mobile card view - hidden on desktop */}
+      <div className="md:hidden space-y-3">
+        {results.map((florum, index) => (
+          <div key={`${florum.id}-${index}`} className="bg-white rounded-xl p-4 border-2 border-gray-200 shadow-sm">
+            <div className="flex justify-between items-start mb-2">
+              <h3 className="text-base font-bold text-green-700 flex-1">
+                {florum?.dutch_name || 'Geen Nederlandse naam'}
+              </h3>
+              <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">#{florum.id}</span>
+            </div>
+            {florum?.english_name && (
+              <p className="text-sm text-gray-600 mb-1">{florum.english_name}</p>
+            )}
+            <p className="text-sm italic text-gray-600 mb-3">{florum.latin_name}</p>
+
+            <div className="space-y-1 mb-3">
+              <p className="text-xs text-gray-700"><span className="font-semibold">Type:</span> {florum?.plant_type}</p>
+              {florum?.bloei_tijd && (
+                <p className="text-xs text-gray-700"><span className="font-semibold">Bloeitijd:</span> {florum.bloei_tijd}</p>
+              )}
+              {florum?.in_heems && (
+                <p className="text-xs text-gray-700"><span className="font-semibold">Inheems:</span> {florum.in_heems}</p>
+              )}
+              {florum?.groen_blijvend && (
+                <p className="text-xs text-gray-700"><span className="font-semibold">Groenblijvend:</span> {florum.groen_blijvend}</p>
+              )}
+              {florum?.be_dreigd && florum.be_dreigd !== 'niet bedreigd' && (
+                <p className="text-xs text-red-600 font-semibold">⚠️ {florum.be_dreigd}</p>
+              )}
+              {florum?.eet_baar && florum.eet_baar.toLowerCase() !== 'niet eetbaar' && (
+                <p className="text-xs text-green-600 font-semibold">🍽️ {florum.eet_baar}</p>
+              )}
+            </div>
+
+            <button
+              onClick={() => dispatch(addToCart(florum))}
+              className="w-full bg-black hover:bg-slate-950 rounded-full text-slate-100 hover:text-white px-4 py-2 text-sm flex items-center justify-center gap-2 border-[2px] border-gray-400 hover:border-orange-600 duration-200"
+            >
+              Toevoegen aan winkelwagen
+            </button>
+          </div>
+        ))}
+      </div>
     </div>
     </Container>
   );

@@ -692,7 +692,7 @@ const PlantCollectionPage = ({ initialCollectionId }: PlantCollectionPageProps) 
         </div>
       }
       { aantal !== undefined && activeTab === 'statistics' &&
-        <div className="grid grid-cols-2">
+        <div className="grid grid-cols-1 md:grid-cols-2">
           <div className="flex flex-col items-center justify-center gap-2 pb-28"><p className="">Bloeiende Planten</p><ChartBloei plantendata4={aantalBloei as any[]} /></div>
           <div className="flex flex-col items-center justify-center gap-2 pb-28"><p className="">Kwetsbaarheid van Inheemsen</p><ChartBedreigd plantendata3={aantalBedreigd as any[]} /></div>
           <div className="flex flex-col items-center justify-center gap-2 pb-14"><p className="">Eetbare Planten</p><ChartEetb plantendata5={aantalEet as any[]} /></div>
@@ -701,9 +701,66 @@ const PlantCollectionPage = ({ initialCollectionId }: PlantCollectionPageProps) 
       }
       { aantal !== undefined && activeTab === 'statistics' &&
         <div className="w-full mb-6 px-6">
-          {/* Plant Cards List */}
           <h2 className="text-xl font-semibold text-gray-800 mb-4">Planten in deze Collectie</h2>
-          <div className="space-y-3 mb-8">
+
+          {/* Desktop table view - hidden on mobile */}
+          <div className="hidden md:block mb-8 overflow-x-auto">
+            <table className="table-auto border-collapse border border-gray-400 w-full text-left bg-white">
+              <thead>
+                <tr className="bg-gray-100">
+                  <th className="border border-gray-300 px-3 py-2">Nr</th>
+                  <th className="border border-gray-300 px-3 py-2">Nederlandse naam</th>
+                  <th className="border border-gray-300 px-3 py-2">Engelse naam</th>
+                  <th className="border border-gray-300 px-3 py-2">Latijnse naam</th>
+                  <th className="border border-gray-300 px-3 py-2">Type plant</th>
+                  <th className="border border-gray-300 px-3 py-2">Bloem kleur</th>
+                  <th className="border border-gray-300 px-3 py-2">Bedreigd</th>
+                  <th className="border border-gray-300 px-3 py-2">Inheems</th>
+                  <th className="border border-gray-300 px-3 py-2">Eetbaar</th>
+                  <th className="border border-gray-300 px-3 py-2">Bloeitijd</th>
+                  <th className="border border-gray-300 px-3 py-2">Groenblijvend</th>
+                </tr>
+              </thead>
+              <tbody>
+                {floras.map((plant) => (
+                  <tr key={plant.id} className="hover:bg-gray-50">
+                    <td className="border border-gray-300 px-3 py-2">{plant.id}</td>
+                    <td className="border border-gray-300 px-3 py-2 font-semibold text-green-700">
+                      {plant.dutch_name || '-'}
+                    </td>
+                    <td className="border border-gray-300 px-3 py-2 text-gray-600 text-sm">
+                      {plant.english_name || '-'}
+                    </td>
+                    <td className="border border-gray-300 px-3 py-2 italic text-gray-600 text-sm">
+                      {plant.latin_name}
+                    </td>
+                    <td className="border border-gray-300 px-3 py-2">{plant.plant_type}</td>
+                    <td className="border border-gray-300 px-3 py-2">{plant.bloem_kleur}</td>
+                    <td className="border border-gray-300 px-3 py-2">
+                      {plant.be_dreigd && plant.be_dreigd !== 'Niet bedreigd' ? (
+                        <span className="text-red-600 font-semibold">{plant.be_dreigd}</span>
+                      ) : (
+                        plant.be_dreigd || '-'
+                      )}
+                    </td>
+                    <td className="border border-gray-300 px-3 py-2">{plant.in_heems}</td>
+                    <td className="border border-gray-300 px-3 py-2">
+                      {plant.eet_baar && plant.eet_baar !== 'Niet eetbaar' ? (
+                        <span className="text-green-600 font-semibold">{plant.eet_baar}</span>
+                      ) : (
+                        plant.eet_baar || '-'
+                      )}
+                    </td>
+                    <td className="border border-gray-300 px-3 py-2">{plant.bloei_tijd}</td>
+                    <td className="border border-gray-300 px-3 py-2">{plant.groen_blijvend}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Mobile card view - hidden on desktop */}
+          <div className="md:hidden space-y-3 mb-8">
             {floras.map((plant) => (
               <div key={plant.id} className="bg-white rounded-xl p-4 border-2 border-gray-200">
                 <div className="flex justify-between items-start mb-1">

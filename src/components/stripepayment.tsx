@@ -77,16 +77,15 @@ const CollectionSubmission = () => {
   };
 
   return (
-    <div className="p-10 w-full">
-      <div className="flex flex-col items-center gap-3 sm:gap-6 lg:gap-8">
-        <button
-          className="btn btn-outline rounded-full bg-darkText text-slate-100 px-2 py-2 text-sm flex items-center border-[2px] border-gray-400 hover:border-orange-600 duration-200 relative"
-          onClick={() => dialogRef.current?.showModal()}
-        >
-          Sla deze Plantencollectie op
-        </button>
+    <div className="w-full">
+      <button
+        className="w-full bg-black hover:bg-slate-950 text-white py-2 sm:py-3 rounded-lg border-[2px] border-gray-400 hover:border-orange-600 duration-200 text-sm sm:text-base font-medium"
+        onClick={() => dialogRef.current?.showModal()}
+      >
+        Sla deze plantencollectie op
+      </button>
 
-        <dialog ref={dialogRef} className="modal bg-white p-6 rounded border-[2px] border-black max-w-md">
+      <dialog ref={dialogRef} className="modal bg-white p-6 rounded border-[2px] border-black max-w-md">
           <h2 className="text-xl font-bold mb-4">Sla uw Plantencollectie op</h2>
 
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -164,8 +163,7 @@ const CollectionSubmission = () => {
               </button>
             </div>
           </form>
-        </dialog>
-      </div>
+      </dialog>
     </div>
   );
 };

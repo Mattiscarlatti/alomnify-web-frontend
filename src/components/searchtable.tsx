@@ -2,6 +2,7 @@
 
 import { useState, useRef } from 'react';
 import { FiSearch } from "react-icons/fi";
+import { IoAdd, IoCheckmark } from "react-icons/io5";
 import { addToCart } from "@/redux/shoppingSlice";
 import { useDispatch, useSelector } from "react-redux";
 import Container from "@/components/container";
@@ -14,6 +15,11 @@ const SearchTable = () => {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<Flora[]>([]);
   const [error, setError] = useState('');
+
+  // Helper function to check if item is in cart
+  const isInCart = (plantId: number) => {
+    return floraData?.some((item: Flora) => item.id === plantId) || false;
+  };
 
   // Filter states
   const [selectedMonths, setSelectedMonths] = useState<number[]>([]);
@@ -169,7 +175,7 @@ const SearchTable = () => {
 
   return (
     <Container>
-    <div className="bg-white/30 p-12 shadow-xl ring-1 ring-gray-900/5 rounded-lg backdrop-blur-lg mx-auto w-full">
+    <div className="bg-white/30 p-3 sm:p-6 md:p-12 shadow-xl ring-1 ring-gray-900/5 rounded-lg backdrop-blur-lg mx-auto w-full">
       {/* Photo Identification Notice */}
       <div className="mb-4 bg-green-50 border-l-4 border-green-500 p-4 rounded">
         <div className="flex items-start">
@@ -199,11 +205,11 @@ const SearchTable = () => {
 
       {/* Filters Section */}
       {showFilters && (
-        <div className="bg-white/50 p-6 rounded-lg mb-6 space-y-4">
+        <div className="bg-white/50 p-3 sm:p-4 md:p-6 rounded-lg mb-6 space-y-4">
           {/* Bloeimaanden Filter */}
           <div>
-            <h3 className="font-semibold text-gray-800 mb-2">Bloeimaanden:</h3>
-            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-2">
+            <h3 className="font-semibold text-gray-800 mb-2 text-sm sm:text-base">Bloeimaanden:</h3>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2">
               {months.map(month => (
                 <label key={month.num} className="flex items-center space-x-2 cursor-pointer">
                   <input
@@ -220,8 +226,8 @@ const SearchTable = () => {
 
           {/* Eetbaarheid Filter */}
           <div>
-            <h3 className="font-semibold text-gray-800 mb-2">Eetbare delen:</h3>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
+            <h3 className="font-semibold text-gray-800 mb-2 text-sm sm:text-base">Eetbare delen:</h3>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 gap-2">
               {edibleParts.map(part => (
                 <label key={part} className="flex items-center space-x-2 cursor-pointer">
                   <input
@@ -238,8 +244,8 @@ const SearchTable = () => {
 
           {/* Bedreigd Filter */}
           <div>
-            <h3 className="font-semibold text-gray-800 mb-2">Bedreigingsstatus:</h3>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+            <h3 className="font-semibold text-gray-800 mb-2 text-sm sm:text-base">Bedreigingsstatus:</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2">
               {threatLevels.map(threat => (
                 <label key={threat.value} className="flex items-center space-x-2 cursor-pointer">
                   <input
@@ -256,7 +262,7 @@ const SearchTable = () => {
 
           {/* Groenblijvend Filter */}
           <div>
-            <h3 className="font-semibold text-gray-800 mb-2">Overige filters:</h3>
+            <h3 className="font-semibold text-gray-800 mb-2 text-sm sm:text-base">Overige filters:</h3>
             <div className="space-y-2">
               <label className="flex items-center space-x-2 cursor-pointer">
                 <input
@@ -420,73 +426,99 @@ const SearchTable = () => {
         </tr>
       </thead>
       <tbody>
-        {results.map((florum, index) => (
-          <tr key={`${florum.id}-${index}`}>
-            <td className="border border-gray-300 px-2 py-2">{florum.id}</td>
-            <td className="border border-gray-300 px-2 py-2 font-semibold">{florum?.dutch_name}</td>
-            <td className="border border-gray-300 px-2 py-2 text-gray-600 text-sm">{florum?.english_name}</td>
-            <td className="border border-gray-300 px-2 py-2 italic text-gray-600 text-sm">{florum.latin_name}</td>
-            <td className="border border-gray-300 px-2 py-2">{florum?.plant_type}</td>
-            <td className="border border-gray-300 px-2 py-2">{florum?.be_dreigd}</td>
-            <td className="border border-gray-300 px-2 py-2">{florum?.in_heems}</td>
-            <td className="border border-gray-300 px-2 py-2">{florum?.eet_baar}</td>
-            <td className="border border-gray-300 px-2 py-2">{florum?.bloei_tijd}</td>
-            <td className="border border-gray-300 px-2 py-2">{florum?.groen_blijvend}</td>
-            <td className="border border-gray-300 px-2 py-2">
-            <button onClick={() => {
-              dispatch(addToCart(florum))
-            }}
-              className="btn btn-outline rounded-full bg-darkText text-slate-100 px-1 py-1 text-sm flex items-center border-[2px] border-gray-400 hover:border-orange-600 duration-200 relative">
-              toevoegen
-            </button>
-            </td>
-          </tr>
-        ))}
+        {results.map((florum, index) => {
+          const inCart = isInCart(florum.id);
+          return (
+            <tr key={`${florum.id}-${index}`}>
+              <td className="border border-gray-300 px-2 py-2">{florum.id}</td>
+              <td className="border border-gray-300 px-2 py-2 font-semibold">{florum?.dutch_name}</td>
+              <td className="border border-gray-300 px-2 py-2 text-gray-600 text-sm">{florum?.english_name}</td>
+              <td className="border border-gray-300 px-2 py-2 italic text-gray-600 text-sm">{florum.latin_name}</td>
+              <td className="border border-gray-300 px-2 py-2">{florum?.plant_type}</td>
+              <td className="border border-gray-300 px-2 py-2">{florum?.be_dreigd}</td>
+              <td className="border border-gray-300 px-2 py-2">{florum?.in_heems}</td>
+              <td className="border border-gray-300 px-2 py-2">{florum?.eet_baar}</td>
+              <td className="border border-gray-300 px-2 py-2">{florum?.bloei_tijd}</td>
+              <td className="border border-gray-300 px-2 py-2">{florum?.groen_blijvend}</td>
+              <td className="border border-gray-300 px-2 py-2">
+                <button
+                  onClick={() => dispatch(addToCart(florum))}
+                  disabled={inCart}
+                  className={`btn btn-outline rounded-full px-2 py-1 text-sm flex items-center border-[2px] duration-200 relative ${
+                    inCart
+                      ? 'bg-gray-300 text-gray-600 border-gray-400 cursor-not-allowed'
+                      : 'bg-darkText text-slate-100 border-gray-400 hover:border-orange-600'
+                  }`}
+                >
+                  {inCart ? 'toegevoegd' : 'toevoegen'}
+                </button>
+              </td>
+            </tr>
+          );
+        })}
       </tbody>
     </table>
 
       {/* Mobile card view - hidden on desktop */}
       <div className="md:hidden space-y-3">
-        {results.map((florum, index) => (
-          <div key={`${florum.id}-${index}`} className="bg-white rounded-xl p-4 border-2 border-gray-200 shadow-sm">
-            <div className="flex justify-between items-start mb-2">
-              <h3 className="text-base font-bold text-green-700 flex-1">
-                {florum?.dutch_name || 'Geen Nederlandse naam'}
-              </h3>
-              <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">#{florum.id}</span>
-            </div>
-            {florum?.english_name && (
-              <p className="text-sm text-gray-600 mb-1">{florum.english_name}</p>
-            )}
-            <p className="text-sm italic text-gray-600 mb-3">{florum.latin_name}</p>
+        {results.map((florum, index) => {
+          const inCart = isInCart(florum.id);
+          return (
+            <div key={`${florum.id}-${index}`} className="bg-white rounded-xl p-4 border-2 border-gray-200 shadow-sm">
+              <div className="flex gap-3">
+                {/* Plant Info */}
+                <div className="flex-1">
+                  <div className="flex items-start mb-1">
+                    <h3 className="text-base font-bold text-green-700 flex-1">
+                      {florum?.dutch_name || 'Geen Nederlandse naam'}
+                    </h3>
+                  </div>
+                  {florum?.english_name && (
+                    <p className="text-sm text-gray-600 mb-1">{florum.english_name}</p>
+                  )}
+                  <p className="text-sm italic text-gray-600 mb-3">{florum.latin_name}</p>
 
-            <div className="space-y-1 mb-3">
-              <p className="text-xs text-gray-700"><span className="font-semibold">Type:</span> {florum?.plant_type}</p>
-              {florum?.bloei_tijd && (
-                <p className="text-xs text-gray-700"><span className="font-semibold">Bloeitijd:</span> {florum.bloei_tijd}</p>
-              )}
-              {florum?.in_heems && (
-                <p className="text-xs text-gray-700"><span className="font-semibold">Inheems:</span> {florum.in_heems}</p>
-              )}
-              {florum?.groen_blijvend && (
-                <p className="text-xs text-gray-700"><span className="font-semibold">Groenblijvend:</span> {florum.groen_blijvend}</p>
-              )}
-              {florum?.be_dreigd && florum.be_dreigd !== 'niet bedreigd' && (
-                <p className="text-xs text-red-600 font-semibold">⚠️ {florum.be_dreigd}</p>
-              )}
-              {florum?.eet_baar && florum.eet_baar.toLowerCase() !== 'niet eetbaar' && (
-                <p className="text-xs text-green-600 font-semibold">🍽️ {florum.eet_baar}</p>
-              )}
-            </div>
+                  <div className="space-y-1">
+                    <p className="text-xs text-gray-700"><span className="font-semibold">Type:</span> {florum?.plant_type}</p>
+                    {florum?.bloei_tijd && (
+                      <p className="text-xs text-gray-700"><span className="font-semibold">Bloeitijd:</span> {florum.bloei_tijd}</p>
+                    )}
+                    {florum?.in_heems && (
+                      <p className="text-xs text-gray-700"><span className="font-semibold">Inheems:</span> {florum.in_heems}</p>
+                    )}
+                    {florum?.groen_blijvend && (
+                      <p className="text-xs text-gray-700"><span className="font-semibold">Groenblijvend:</span> {florum.groen_blijvend}</p>
+                    )}
+                    {florum?.be_dreigd && florum.be_dreigd !== 'niet bedreigd' && (
+                      <p className="text-xs text-red-600 font-semibold">⚠️ {florum.be_dreigd}</p>
+                    )}
+                    {florum?.eet_baar && florum.eet_baar.toLowerCase() !== 'niet eetbaar' && (
+                      <p className="text-xs text-green-600 font-semibold">🍽️ {florum.eet_baar}</p>
+                    )}
+                  </div>
+                </div>
 
-            <button
-              onClick={() => dispatch(addToCart(florum))}
-              className="w-full bg-black hover:bg-slate-950 rounded-full text-slate-100 hover:text-white px-4 py-2 text-sm flex items-center justify-center gap-2 border-[2px] border-gray-400 hover:border-orange-600 duration-200"
-            >
-              Toevoegen aan winkelwagen
-            </button>
-          </div>
-        ))}
+                {/* Add to Cart Button */}
+                <button
+                  onClick={() => dispatch(addToCart(florum))}
+                  disabled={inCart}
+                  className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center border-2 transition-colors ${
+                    inCart
+                      ? 'bg-gray-300 border-gray-400 cursor-not-allowed'
+                      : 'bg-blue-500 border-gray-400 hover:border-orange-600'
+                  }`}
+                  title={inCart ? 'Al toegevoegd' : 'Toevoegen aan winkelwagen'}
+                >
+                  {inCart ? (
+                    <IoCheckmark className="text-gray-600 text-xl" />
+                  ) : (
+                    <IoAdd className="text-white text-xl" />
+                  )}
+                </button>
+              </div>
+            </div>
+          );
+        })}
       </div>
     </div>
     </Container>

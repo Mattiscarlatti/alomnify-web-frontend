@@ -529,7 +529,7 @@ const PlantCollectionPage = ({ initialCollectionId }: PlantCollectionPageProps) 
 
   return (
     <Container>
-    <div className="grid grid-cols-1 gap-6 bg-white/30 p-12 shadow-xl ring-1 ring-gray-900/5 rounded-lg backdrop-blur-lg mx-auto w-full">
+    <div className="grid grid-cols-1 gap-6 bg-white/30 p-3 sm:p-6 md:p-12 shadow-xl ring-1 ring-gray-900/5 rounded-lg backdrop-blur-lg mx-auto w-full">
       { txH &&
         <div className="grid grid-cols-4 px-3 py-2">
           <p className="flex flex-col col-span-4 rounded-l-xl items-center justify-center gap-x-1 px-3 py-1">De resultaten worden getoond van PlantenCollectie ID: {txH}</p>
@@ -554,21 +554,21 @@ const PlantCollectionPage = ({ initialCollectionId }: PlantCollectionPageProps) 
         </div>
       )}
 
-      <div className="flex flex-col gap-0 px-3 py-2">
+      <div className="flex flex-col gap-0 px-1 sm:px-2 md:px-3 py-2">
         {/* Input field */}
         <input
           type="text"
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
           placeholder="Voer uw 64-karakter collectie ID in..."
-          className="text-center text-xs sm:text-base px-2 sm:px-3 py-3 border-[2px] border-gray-400 hover:border-orange-600 focus:border-orange-600 duration-200 rounded-t-xl outline-none"
+          className="text-center text-xs sm:text-sm md:text-base px-2 sm:px-3 py-2 sm:py-3 border-[2px] border-gray-400 hover:border-orange-600 focus:border-orange-600 duration-200 rounded-t-xl outline-none"
           name="inputtxh"
         />
 
         {/* Load collection button */}
         <button
           onClick={handleClick2}
-          className="bg-black hover:bg-slate-950 text-xs sm:text-base text-slate-100 hover:text-white flex items-center justify-center px-2 sm:px-3 py-3 border-[2px] border-t-0 border-gray-400 hover:border-orange-600 duration-200"
+          className="bg-black hover:bg-slate-950 text-xs sm:text-sm md:text-base text-slate-100 hover:text-white flex items-center justify-center px-2 sm:px-3 py-2 sm:py-3 border-[2px] border-t-0 border-gray-400 hover:border-orange-600 duration-200"
         >
           Laad Collectie
         </button>
@@ -577,7 +577,7 @@ const PlantCollectionPage = ({ initialCollectionId }: PlantCollectionPageProps) 
         <button
           onClick={handleSaveCollection}
           disabled={isExampleCollection}
-          className={`text-xs sm:text-base flex items-center justify-center px-2 sm:px-3 py-3 border-[2px] border-t-0 border-gray-400 duration-200 ${
+          className={`text-xs sm:text-sm md:text-base flex items-center justify-center px-2 sm:px-3 py-2 sm:py-3 border-[2px] border-t-0 border-gray-400 duration-200 ${
             isExampleCollection
               ? 'bg-gray-400 text-gray-600 cursor-not-allowed'
               : 'bg-black hover:bg-slate-950 text-slate-100 hover:text-white hover:border-orange-600'
@@ -590,7 +590,7 @@ const PlantCollectionPage = ({ initialCollectionId }: PlantCollectionPageProps) 
         {/* Load example collection button */}
         <button
           onClick={handleLoadExampleCollection}
-          className="bg-black rounded-b-xl hover:bg-slate-950 text-xs sm:text-base text-slate-100 hover:text-white flex items-center justify-center px-2 sm:px-3 py-3 border-[2px] border-t-0 border-gray-400 hover:border-orange-600 duration-200"
+          className="bg-black rounded-b-xl hover:bg-slate-950 text-xs sm:text-sm md:text-base text-slate-100 hover:text-white flex items-center justify-center px-2 sm:px-3 py-2 sm:py-3 border-[2px] border-t-0 border-gray-400 hover:border-orange-600 duration-200"
         >
           Laad Voorbeeldcollectie
         </button>
@@ -654,37 +654,37 @@ const PlantCollectionPage = ({ initialCollectionId }: PlantCollectionPageProps) 
 
       {/* Statistics Tab Content */}
       { aantal !== undefined && activeTab === 'statistics' &&
-        <div className="w-full mb-6 px-6">
+        <div className="w-full mb-6 px-2 sm:px-4 md:px-6">
           {/* Biodiversity Score Card */}
-          <div className="bg-green-50 border-2 border-green-700 rounded-2xl p-8 mb-6 shadow-lg text-center">
+          <div className="bg-green-50 border-2 border-green-700 rounded-2xl p-4 sm:p-6 md:p-8 mb-6 shadow-lg text-center">
             <h2 className="text-xl font-bold text-green-800 mb-3">🌿 Biodiversiteitsscore</h2>
             <div className="text-6xl font-bold text-green-700 mb-2">{totalScore}</div>
           </div>
 
           {/* Stat Cards Grid */}
-          <div className="grid grid-cols-2 gap-3 mb-8">
-            <div className="bg-white border-2 border-gray-200 rounded-xl p-4 text-center">
-              <div className="text-3xl font-bold text-green-700">{aantal}</div>
+          <div className="grid grid-cols-2 gap-2 sm:gap-3 mb-8">
+            <div className="bg-white border-2 border-gray-200 rounded-xl p-2 sm:p-3 md:p-4 text-center">
+              <div className="text-2xl sm:text-3xl font-bold text-green-700">{aantal}</div>
               <div className="text-xs text-gray-600 mt-1">Totaal Planten</div>
             </div>
-            <div className="bg-white border-2 border-gray-200 rounded-xl p-4 text-center">
-              <div className="text-3xl font-bold text-green-700">{aantalEetbaar}</div>
+            <div className="bg-white border-2 border-gray-200 rounded-xl p-2 sm:p-3 md:p-4 text-center">
+              <div className="text-2xl sm:text-3xl font-bold text-green-700">{aantalEetbaar}</div>
               <div className="text-xs text-gray-600 mt-1">Eetbaar</div>
             </div>
-            <div className="bg-white border-2 border-gray-200 rounded-xl p-4 text-center">
-              <div className="text-3xl font-bold text-green-700">{aantalInh}</div>
+            <div className="bg-white border-2 border-gray-200 rounded-xl p-2 sm:p-3 md:p-4 text-center">
+              <div className="text-2xl sm:text-3xl font-bold text-green-700">{aantalInh}</div>
               <div className="text-xs text-gray-600 mt-1">Inheems</div>
             </div>
-            <div className="bg-white border-2 border-gray-200 rounded-xl p-4 text-center">
-              <div className="text-3xl font-bold text-green-700">{(aantalBedreigd2 || 0) + (aantalErnstigB || 0)}</div>
+            <div className="bg-white border-2 border-gray-200 rounded-xl p-2 sm:p-3 md:p-4 text-center">
+              <div className="text-2xl sm:text-3xl font-bold text-green-700">{(aantalBedreigd2 || 0) + (aantalErnstigB || 0)}</div>
               <div className="text-xs text-gray-600 mt-1">(Ernstig) Bedreigd</div>
             </div>
-            <div className="bg-white border-2 border-gray-200 rounded-xl p-4 text-center">
-              <div className="text-3xl font-bold text-green-700">{aantalBomen25}</div>
+            <div className="bg-white border-2 border-gray-200 rounded-xl p-2 sm:p-3 md:p-4 text-center">
+              <div className="text-2xl sm:text-3xl font-bold text-green-700">{aantalBomen25}</div>
               <div className="text-xs text-gray-600 mt-1">Bomen 25+ jaar</div>
             </div>
-            <div className="bg-white border-2 border-gray-200 rounded-xl p-4 text-center">
-              <div className="text-3xl font-bold text-green-700">{aantalGroen}</div>
+            <div className="bg-white border-2 border-gray-200 rounded-xl p-2 sm:p-3 md:p-4 text-center">
+              <div className="text-2xl sm:text-3xl font-bold text-green-700">{aantalGroen}</div>
               <div className="text-xs text-gray-600 mt-1">Groenblijvend</div>
             </div>
           </div>
@@ -692,16 +692,16 @@ const PlantCollectionPage = ({ initialCollectionId }: PlantCollectionPageProps) 
         </div>
       }
       { aantal !== undefined && activeTab === 'statistics' &&
-        <div className="grid grid-cols-1 md:grid-cols-2">
-          <div className="flex flex-col items-center justify-center gap-2 pb-28"><p className="">Bloeiende Planten</p><ChartBloei plantendata4={aantalBloei as any[]} /></div>
-          <div className="flex flex-col items-center justify-center gap-2 pb-28"><p className="">Kwetsbaarheid van Inheemsen</p><ChartBedreigd plantendata3={aantalBedreigd as any[]} /></div>
-          <div className="flex flex-col items-center justify-center gap-2 pb-14"><p className="">Eetbare Planten</p><ChartEetb plantendata5={aantalEet as any[]} /></div>
-          <div className="flex flex-col items-center justify-center gap-2 pb-14"><p className="">Type Planten</p><ChartPlantTypen plantendata1={aantalType as any[]} /></div>
+        <div className="grid grid-cols-1 md:grid-cols-2 px-2 sm:px-4 md:px-0">
+          <div className="flex flex-col items-center justify-center gap-2 pb-20 sm:pb-28"><p className="text-sm sm:text-base font-medium">Bloeiende Planten</p><ChartBloei plantendata4={aantalBloei as any[]} /></div>
+          <div className="flex flex-col items-center justify-center gap-2 pb-20 sm:pb-28"><p className="text-sm sm:text-base font-medium">Kwetsbaarheid van Inheemsen</p><ChartBedreigd plantendata3={aantalBedreigd as any[]} /></div>
+          <div className="flex flex-col items-center justify-center gap-2 pb-10 sm:pb-14"><p className="text-sm sm:text-base font-medium">Eetbare Planten</p><ChartEetb plantendata5={aantalEet as any[]} /></div>
+          <div className="flex flex-col items-center justify-center gap-2 pb-10 sm:pb-14"><p className="text-sm sm:text-base font-medium">Type Planten</p><ChartPlantTypen plantendata1={aantalType as any[]} /></div>
         </div>
       }
       { aantal !== undefined && activeTab === 'statistics' &&
-        <div className="w-full mb-6 px-6">
-          <h2 className="text-xl font-semibold text-gray-800 mb-4">Planten in deze Collectie</h2>
+        <div className="w-full mb-6 px-2 sm:px-4 md:px-6">
+          <h2 className="text-lg sm:text-xl font-semibold text-gray-800 mb-4">Planten in deze Collectie</h2>
 
           {/* Desktop table view - hidden on mobile */}
           <div className="hidden md:block mb-8 overflow-x-auto">
@@ -762,7 +762,7 @@ const PlantCollectionPage = ({ initialCollectionId }: PlantCollectionPageProps) 
           {/* Mobile card view - hidden on desktop */}
           <div className="md:hidden space-y-3 mb-8">
             {floras.map((plant) => (
-              <div key={plant.id} className="bg-white rounded-xl p-4 border-2 border-gray-200">
+              <div key={plant.id} className="bg-white rounded-xl p-3 sm:p-4 border-2 border-gray-200">
                 <div className="flex justify-between items-start mb-1">
                   <h3 className="text-base font-bold text-green-700 flex-1">{plant.dutch_name || 'Geen Nederlandse naam'}</h3>
                   <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">#{plant.id}</span>
